@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #DDDADA;
+}
+
+.topnav a {
+  float: right;
+  color: #525252;
+  text-align: center;
+  padding: 24px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #6D6664;
+  color: white;
+}
+
+.topnav a.active {
+  background-color: #FF775C;
+  color: white;
+}
+
+.heading {
+  font-size: 40px;
+}
+
+.landing {
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 80%; /* Or any specific width */
+  margin: auto;
+  height: 500px;
+  line-height: 200px;
+  text-align: center; 
+  color: white;
+  text-shadow: 4px 4px black; 
+  background-image: url("https://images.squarespace-cdn.com/content/v1/65f6241cf8169f722f74d8c7/a97e52b0-e3cd-4f80-ba33-629bf183932c/Salsbery+Brothers+Landscaping+%284%29.gif");
+}
+
+.desc {
+  line-height: 30px;
+  font-size: 28px;
+  text-shadow: 2px 2px black;
+  width: 60%;
+  text-align: center;
+  margin: auto;
+}
