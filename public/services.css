@@ -1,0 +1,174 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #DDDADA;
+}
+
+.topnav a {
+  float: right;
+  color: #525252;
+  text-align: center;
+  padding: 24px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #6D6664;
+  color: white;
+}
+
+.topnav a.active {
+  background-color: #FF775C;
+  color: white;
+}
+
+.services-overview {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.services-overview .intro {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.services-overview .intro h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.services-overview .intro p {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.services-overview .service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+.services-overview .service-card {
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  text-align: left;
+}
+
+.services-overview .service-card h2 {
+  font-size: 1.75rem;
+  margin-bottom: 15px;
+}
+
+.services-overview .service-card p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.services-overview .service-card a {
+  font-size: 1rem;
+  color: #007BFF;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.services-overview .service-card a:hover {
+  text-decoration: underline;
+}
+
+.services-overview .cta {
+  text-align: center;
+}
+
+.services-overview .cta h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.services-overview .cta .btn {
+  display: inline-block;
+  padding: 15px 35px;
+  font-size: 1.125rem;
+  color: #fff;
+  background-color: #007BFF;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.services-overview .cta .btn:hover {
+  background-color: #0056b3;
+}
+
+.site-footer {
+  background-color: #222;
+  color: #f4f4f4;
+  padding: 60px 20px 30px;
+  font-family: Arial, sans-serif;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-column h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.footer-column p,
+.footer-column li,
+.footer-column a {
+  font-size: 0.95rem;
+  color: #ccc;
+  line-height: 1.6;
+  text-decoration: none;
+}
+
+.footer-column a:hover {
+  color: #fff;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-links a img {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.2s ease;
+}
+
+.social-links a img:hover {
+  transform: scale(1.1);
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #444;
+  margin-top: 40px;
+  padding-top: 20px;
+  font-size: 0.9rem;
+  color: #aaa;
+}

@@ -1,0 +1,181 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #DDDADA;
+}
+
+.topnav a {
+  float: right;
+  color: #525252;
+  text-align: center;
+  padding: 24px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #6D6664;
+  color: white;
+}
+
+.topnav a.active {
+  background-color: #FF775C;
+  color: white;
+}
+
+.heading {
+  font-size: 40px;
+}
+
+.landing {
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 80%; /* Or any specific width */
+  margin: auto;
+  height: 500px;
+  line-height: 200px;
+  text-align: center; 
+  color: white;
+  text-shadow: 4px 4px black; 
+  background-image: url("https://images.squarespace-cdn.com/content/v1/65f6241cf8169f722f74d8c7/a97e52b0-e3cd-4f80-ba33-629bf183932c/Salsbery+Brothers+Landscaping+%284%29.gif");
+}
+
+.desc {
+  line-height: 30px;
+  font-size: 28px;
+  text-shadow: 2px 2px black;
+  width: 60%;
+  text-align: center;
+  margin: auto;
+}
+
+.container {
+  border: 2px solid #ccc;
+  background-color: #eee;
+  border-radius: 5px;
+  padding: 16px;
+  margin: 16px 0
+}
+
+.container::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.container img {
+  float: left;
+  margin-right: 20px;
+  border-radius: 50%;
+}
+
+.container span {
+  font-size: 20px;
+  margin-right: 15px;
+}
+
+@media (max-width: 500px) {
+  .container {
+      text-align: center;
+  }
+  .container img {
+      margin: auto;
+      float: none;
+      display: block;
+  }
+}
+
+.highlight {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* two equal-width columns */
+  padding: 150px;
+  border: 1px solid #ccc;
+}
+
+.left-text {
+  text-align: center;
+  font-size:30px;
+  justify-self: start;
+  margin-left: 160px;
+}
+
+.right-text {
+  font-size: 20px;
+  text-align: center;
+  justify-self: end;
+}
+
+.serviceButton {
+  height:90px;
+  width: 200px;
+  font-size: 20px;
+}
+
+.reviews {
+  text-align: center;
+}
+
+.site-footer {
+  background-color: #222;
+  color: #f4f4f4;
+  padding: 60px 20px 30px;
+  font-family: Arial, sans-serif;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-column h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.footer-column p,
+.footer-column li,
+.footer-column a {
+  font-size: 0.95rem;
+  color: #ccc;
+  line-height: 1.6;
+  text-decoration: none;
+}
+
+.footer-column a:hover {
+  color: #fff;
+}
+
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-links a img {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.2s ease;
+}
+
+.social-links a img:hover {
+  transform: scale(1.1);
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #444;
+  margin-top: 40px;
+  padding-top: 20px;
+  font-size: 0.9rem;
+  color: #aaa;
+}
