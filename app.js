@@ -42,10 +42,80 @@ function error(res, status, message) {
 }
 
 
+// --- handles /login POST (expects JSON: { role, email, password }) ---
+function handleLogin(req, res) {
+  let body = '';
+  req.on('data', chunk => (body += chunk));
+  req.on('end', () => {
+    try {
+      const data = JSON.parse(body || '{}');
+      const role = (data.role || '').toLowerCase();
+
+      // TODO: add real auth here; for now we just route by role
+      let redirect = null;
+      if (role === 'homeowner' || role === 'client' || role === 'home') {
+        redirect = '/homeDashboard.html';
+      } else if (role === 'contractor' || role === 'con') {
+        redirect = '/conDashboard.html';
+      } else if (role === 'admin') {
+        redirect = '/adminDashboard.html';
+      }
+
+      if (!redirect) {
+        res.writeHead(400, { 'content-type': 'application/json' });
+        return res.end(JSON.stringify({ ok: false, error: 'Invalid role' }));
+      }
+
+      // respond in a fetch-friendly way
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, redirect }));
+    } catch (e) {
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Bad JSON' }));
+    }
+  });
+}
 
 const serverObj = http.createServer(function (req, res) {
     console.log("Request URL:", req.url);
     const urlObj = url.parse(req.url, true);
+	// ---- LOGIN HANDLER (supports GET and POST) ----
+if (urlObj.pathname === '/login') {
+  // helper for quick JSON responses (used by POST path)
+  function sendJSON(status, obj) {
+    res.writeHead(status, { 'content-type': 'application/json' });
+    return res.end(JSON.stringify(obj));
+  }
+
+  if (req.method === 'GET') {
+    // GET /login?role=...&username=...&password=...
+    const { role, username, password } = urlObj.query || {};
+    if (!role || !username || !password) {
+      res.writeHead(400, { 'content-type': 'text/plain' });
+      return res.end('Missing role/username/password');
+    }
+
+    // demo redirect by role (dashboards are already in public/)
+    const redirectMap = {
+      contractor: '/conDashboard.html',
+      homeowner:  '/homeDashboard.html',
+      admin:      '/adminDashboard.html',
+    };
+    const dest = redirectMap[role] || '/login.html';
+    res.writeHead(302, { Location: dest });
+    return res.end();
+  }
+
+  if (req.method === 'POST') {
+    // You already have handleLogin(req,res) defined above.
+    // It should read JSON body and respond with JSON.
+    return handleLogin(req, res);
+  }
+
+  res.writeHead(405, { 'content-type': 'text/plain' });
+  return res.end('Method Not Allowed');
+}
+// ---- END LOGIN HANDLER ----
 
     switch (urlObj.pathname) {
         case "/schedule":
