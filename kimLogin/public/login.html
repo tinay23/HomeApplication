@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <style>
+    body {
+	  background-image: url("https://static.vecteezy.com/system/resources/thumbnails/057/283/718/small/grass-field-carbon-net-zero-concept-background-image-photo.jpg");
+	  background-repeat: no-repeat;
+	  background-size: cover;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 1000px;
+    }
+
+    .loginBox {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px black;
+      width: 300px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid black;
+      
+    }
+
+    button {
+      width: 95%;
+      padding: 10px;
+      background-color: black;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background-color: grey;
+    }
+
+    .message {
+      margin-top: 10px;
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="loginBox">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="conloginBtn"> Contractor Login</button>
+	<button id="homeloginBtn"> Homeowner Login</button>
+	<button id="adminloginBtn"> Admin Login</button>
+    <p id="message" class="message"></p>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>
