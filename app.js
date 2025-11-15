@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const pool = require('./database');
 
 function sendFile(filePath, res) {
     fs.readFile(filePath, function (err, data) {
@@ -42,60 +43,94 @@ function error(res, status, message) {
 }
 
 
-// --- handles /login POST (expects JSON: { role, email, password }) ---
+// the login using mysql
 function handleLogin(req, res) {
   let body = '';
   req.on('data', chunk => (body += chunk));
-  req.on('end', () => {
+
+  req.on('end', async () => {
     try {
       const data = JSON.parse(body || '{}');
-      const role = (data.role || '').toLowerCase();
 
-      // TODO: add real auth here; for now we just route by role
-      let redirect = null;
-      if (role === 'homeowner' || role === 'client' || role === 'home') {
-        redirect = '/homeDashboard.html';
-      } else if (role === 'contractor' || role === 'con') {
-        redirect = '/conDashboard.html';
-      } else if (role === 'admin') {
-        redirect = '/adminDashboard.html';
-      }
+      let role = (data.role || '').toLowerCase();
+      if (role === 'client' || role === 'home') role = 'homeowner';
+      if (role === 'con') role = 'contractor';
 
-      if (!redirect) {
+      const emailOrUsername =
+        (data.email || data.username || '').toLowerCase();
+      const password = data.password || '';
+
+      if (!role || !emailOrUsername || !password) {
         res.writeHead(400, { 'content-type': 'application/json' });
-        return res.end(JSON.stringify({ ok: false, error: 'Invalid role' }));
+        return res.end(
+          JSON.stringify({
+            ok: false,
+            error: 'Missing role/email/username/password',
+          })
+        );
       }
 
-      // respond in a fetch-friendly way
+      // this is where it chrcks the users table for a matching user
+      const [rows] = await pool.query(
+        'SELECT * FROM users WHERE role = ? AND email = ? AND password_hash = ? LIMIT 1',
+        [role, emailOrUsername, password]
+      );
+
+      if (rows.length === 0) {
+        // if no matches found then it will prompt invalid
+        res.writeHead(401, { 'content-type': 'application/json' });
+        return res.end(
+          JSON.stringify({ ok: false, error: 'Invalid credentials' })
+        );
+      }
+
+      // ✔️ if their is a match found it will redirect based on role
+      let redirect = '/homeDashboard.html';
+      if (role === 'contractor') redirect = '/conDashboard.html';
+      if (role === 'admin') redirect = '/adminDashboard.html';
+
       res.writeHead(200, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, redirect }));
-    } catch (e) {
-      res.writeHead(400, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'Bad JSON' }));
+      return res.end(JSON.stringify({ ok: true, redirect }));
+    } catch (error) {
+      console.error(error);
+      res.writeHead(500, { 'content-type': 'application/json' });
+      return res.end(
+        JSON.stringify({ ok: false, error: 'Server error / bad JSON' })
+      );
     }
   });
 }
 
-const serverObj = http.createServer(function (req, res) {
+const serverObj = http.createServer(async function (req, res) {
     console.log("Request URL:", req.url);
     const urlObj = url.parse(req.url, true);
-	// ---- LOGIN HANDLER (supports GET and POST) ----
+// this is a test 
+if (urlObj.pathname === '/test-db') {
+    try {
+      const [rows] = await pool.query('SELECT 1 + 1 AS result');
+      res.writeHead(200, { 'content-type': 'text/plain' });
+      return res.end('Database connection works! Result: ' + rows[0].result);
+    } catch (err) {
+      console.error(err);
+      res.writeHead(500, { 'content-type': 'text/plain' });
+      return res.end('Database error: ' + err.message);
+    }
+  }
+	// this is the login handleer 
 if (urlObj.pathname === '/login') {
-  // helper for quick JSON responses (used by POST path)
+  // helper for quick JSON responses used by post  
   function sendJSON(status, obj) {
     res.writeHead(status, { 'content-type': 'application/json' });
     return res.end(JSON.stringify(obj));
   }
 
   if (req.method === 'GET') {
-    // GET /login?role=...&username=...&password=...
     const { role, username, password } = urlObj.query || {};
     if (!role || !username || !password) {
       res.writeHead(400, { 'content-type': 'text/plain' });
       return res.end('Missing role/username/password');
     }
 
-    // demo redirect by role (dashboards are already in public/)
     const redirectMap = {
       contractor: '/conDashboard.html',
       homeowner:  '/homeDashboard.html',
@@ -107,15 +142,13 @@ if (urlObj.pathname === '/login') {
   }
 
   if (req.method === 'POST') {
-    // You already have handleLogin(req,res) defined above.
-    // It should read JSON body and respond with JSON.
     return handleLogin(req, res);
   }
 
   res.writeHead(405, { 'content-type': 'text/plain' });
   return res.end('Method Not Allowed');
 }
-// ---- END LOGIN HANDLER ----
+// end of login handler
 
     switch (urlObj.pathname) {
         case "/schedule":
@@ -131,7 +164,7 @@ if (urlObj.pathname === '/login') {
             // Build file path for static files
             let filePath = path.join(__dirname, "public", urlObj.pathname);
 
-            // Default to index.html if just "/"
+            // Default to index.html
             if (urlObj.pathname === "/") {
                 filePath = path.join(__dirname, "public", "index.html");
             }
