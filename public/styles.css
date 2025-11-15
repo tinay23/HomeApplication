@@ -1,16 +1,18 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
+  background-color: #ABA9BF;
 }
 
 .topnav {
   overflow: hidden;
-  background-color: #DDDADA;
+  background-color: #48284A;
 }
 
 .topnav a {
-  float: right;
-  color: #525252;
+  float: left;
+  color: #ffffff;
+  font-weight:bold;
   text-align: center;
   padding: 24px 16px;
   text-decoration: none;
@@ -23,8 +25,12 @@ body {
 }
 
 .topnav a.active {
-  background-color: #FF775C;
-  color: white;
+  background-color: #D7AF70;
+  color: black;
+}
+
+.topnav a:last-child {
+  float: right;
 }
 
 .heading {
@@ -94,6 +100,7 @@ body {
   grid-template-columns: 1fr 1fr; /* two equal-width columns */
   padding: 150px;
   border: 1px solid #ccc;
+  background-color: #114B5F;
 }
 
 .left-text {
@@ -101,12 +108,14 @@ body {
   font-size:30px;
   justify-self: start;
   margin-left: 160px;
+  color:white;
 }
 
 .right-text {
   font-size: 20px;
   text-align: center;
   justify-self: end;
+  color: white;
 }
 
 .serviceButton {
