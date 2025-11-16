@@ -5,6 +5,7 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Home Application</title>
             <link rel="stylesheet" href="/styles.css"> <!-- Link to your CSS -->
+	    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
         </head>
         <body>    
 		<div class="topnav">
@@ -26,11 +27,11 @@
 		<div class="highlight">
 			<div class="left-text"><h2>Our experienced<br> and innovative<br> team will bring<br> your vision<br> to reality.</h2></div>
   			<div class="right-text"><br>We make home management effortless. Enjoy a clean, comfortable, and well-kept home without the stress — from laundry and lawn care to plumbing and more. Let us take care of the details, so you can focus on what matters most.
-				<br><br><br><br><a href="services.html"><button class="serviceButton">check out our services</button></a>
+				<br><br><br><br><br><br><a href="services.html"><button class="serviceButton">Check out our services</button></a>
 			</div>
 			
 		</div>
-		<div class="reviews">
+		<!-- <div class="reviews">
 			<h1>Reviews</h1>
 		</div>
             	<div class="container">
@@ -49,7 +50,54 @@
                         <img src="https://img.freepik.com/free-photo/close-up-portrait-curly-handsome-european-male_176532-8133.jpg?semt=ais_hybrid&w=740&q=80" alt="Avatar" style="width:90px">
                         <p><span>David Roe</span></p>
                         <p>“A pipe burst in my kitchen, and I found a plumber through the app within minutes. The technician arrived fast, fixed everything, and the pricing was totally transparent. Having a reliable service just a few taps away is a lifesaver!”</p>
-                </div>
+                </div> -->
+		
+		<div class="swiper">
+  <div class="swiper-wrapper">
+
+    <div class="swiper-slide">
+      <div class="testimonial-card">
+        <img src="img/profile1.jpg">
+        <p class="quote">“Quis ipsum suspendisse ultrices gravida maecenas accumsan lacus.”</p>
+        <h3 class="name">Devon Larret</h3>
+        <div class="role">Founder, Some Company</div>
+      </div>
+    </div>
+
+    <div class="swiper-slide">
+      <div class="testimonial-card">
+        <img src="img/profile2.jpg">
+        <p class="quote">“Cras et nim quam, viverra sit amet purus eget tempus pulvinar.”</p>
+        <h3 class="name">Jenna Smith</h3>
+        <div class="role">Founder, Some Company</div>
+      </div>
+    </div>
+
+    <div class="swiper-slide">
+      <div class="testimonial-card">
+        <img src="img/profile3.jpg">
+        <p class="quote">“Fusce ac nunc laoreet, lobortis libero nec velit sollicitudin.”</p>
+        <h3 class="name">Ryan Walker</h3>
+        <div class="role">Founder, Some Company</div>
+      </div>
+    </div>
+
+
+<div class="swiper-slide">
+      <div class="testimonial-card">
+        <img src="img/profile3.jpg">
+        <p class="quote">“Fusce ac nunc laoreet, lobortis libero nec velit sollicitudin.”</p>
+        <h3 class="name">Ryan Walker</h3>
+        <div class="role">Founder, Some Company</div>
+      </div>
+    </div>
+    <!-- Add more slides if you want -->
+  </div>
+
+  <!-- Arrows -->
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-button-next"></div>
+</div>
 
 		<footer class="site-footer">
   <div class="footer-container">
@@ -91,6 +139,7 @@
     <p>&copy; 2025 HomeEase. All rights reserved.</p>
   </div>
 </footer>
-
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="/index.js"></script>
         </body>
         </html>
