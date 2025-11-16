@@ -47,6 +47,7 @@ body {
   background-repeat: no-repeat;
   width: 80%; /* Or any specific width */
   margin: auto;
+  margin-top:70px;
   height: 500px;
   line-height: 200px;
   text-align: center; 
@@ -62,6 +63,10 @@ body {
   width: 60%;
   text-align: center;
   margin: auto;
+}
+
+.textbox1 {
+  opacity:1.0;
 }
 
 .container {
@@ -115,7 +120,7 @@ body {
   font-size:30px;
   justify-self: start;
   margin-left: 160px;
-  color:white;
+  color:black;
   margin-top: 100px;
 }
 
@@ -123,31 +128,31 @@ body {
   font-size: 20px;
   text-align: center;
   justify-self: end;
-  color: white;
+  color: black;
   margin-top: 120px;
 }
 
   
 .serviceButton {
-  background: #6D6664;
+  background: #111111;
   color: #ffffff;
-  border: 7px solid #6D6664;
+  border: 7px solid #111111;
   border-radius: 12px;
   padding: 24px 59px;
   font-size: 16px;
-  font-weight: 500;
-  box-shadow: 3px 4px 4px #48284A, 0 0 34px #48284A;
+  font-weight: bold;
+  box-shadow: 3px 4px 4px #ededed, 0 0 34px #ededed;
   transition: all 300ms ease;
   cursor: pointer;
   outline: none;
 }
 
 .serviceButton:hover {
-  background: #6D6664;
+  background: #111111;
   color: #ffffff;
-  border-color: #6D6664;
+  border-color: #111111;
   transform: scale(1.23);
-  box-shadow: 0px 6px 6px #48284A, 0 0 22px #48284A;
+  box-shadow: 0px 6px 6px #ededed, 0 0 22px #ededed;
 }
 
 .swiper {
@@ -156,7 +161,7 @@ body {
 }
 
 .testimonial-card {
-  background: #0084a8; /* teal like your screenshot */
+  background: #2c2c2c; /* teal like your screenshot */
   color: white;
   padding: 40px 25px;
   border-radius: 12px;
