@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create User</title>
+</head>
+<body>
+
+<h2>Create New User</h2>
+<div id="msg"></div>
+
+<label>Full Name:</label><br>
+<input id="full_name"><br><br>
+
+<label>Email:</label><br>
+<input id="email"><br><br>
+
+<label>Password:</label><br>
+<input id="password" type="password"><br><br>
+
+<label>Role:</label><br>
+<select id="role">
+  <option value="homeowner">Homeowner</option>
+  <option value="contractor">Contractor</option>
+  <option value="admin">Admin</option>
+</select><br><br>
+
+<button onclick="createUser()">Create</button>
+
+<script>
+function createUser() {
+  const body = {
+    full_name: document.getElementById('full_name').value.trim(),
+    email:     document.getElementById('email').value.trim(),
+    password:  document.getElementById('password').value,
+    role:      document.getElementById('role').value
+  };
+
+  fetch("/create_user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  })
+  .then(r => r.json())
+  .then(d => {
+    const msg = document.getElementById('msg');
+    msg.style.color = d.success ? "green" : "red";
+    msg.textContent = d.message;
+  })
+  .catch(() => {
+    msg.style.color = "red";
+    msg.textContent = "Network error";
+  });
+}
+</script>
+
+</body>
+</html>
