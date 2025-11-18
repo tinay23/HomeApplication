@@ -5,12 +5,16 @@ body {
 
 .topnav {
   overflow: hidden;
-  background-color: #DDDADA;
+  background-color: #111111;
+  position: fixed;
+  top: 0;
+  width: 100%;
 }
 
 .topnav a {
-  float: right;
-  color: #525252;
+  float: left;
+  color: #ffffff;
+  font-weight:bold;
   text-align: center;
   padding: 24px 16px;
   text-decoration: none;
@@ -23,10 +27,14 @@ body {
 }
 
 .topnav a.active {
-  background-color: #FF775C;
-  color: white;
+  background-color: #D7AF70;
+  color: black;
 }
-
+/*
+.topnav a:last-child {
+  float: right;
+}
+*/
 .services-overview {
   max-width: 1200px;
   margin: 0 auto;

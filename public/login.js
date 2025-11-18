@@ -10,12 +10,12 @@ function login(role) {
     let msg = document.getElementById("message");
 
     if (!email || !password) {
+        msg.textContent = "Please enter both username and password.";
         msg.style.color = "red";
-        msg.textContent = "Please enter both email and password.";
         return;
     }
 
-    // Send POST login request to backend
+    // LOGIN USING POST REQUEST
     fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -24,29 +24,31 @@ function login(role) {
             password: password
         })
     })
-    .then(res => {
-        if (!res.ok) {
-            throw new Error("Server returned error status");
-        }
-        return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
-        if (data.ok) {
-            msg.style.color = "green";
-            msg.textContent = "Login successful! Redirecting...";
 
-            // Redirect from server: /homeDashboard.html, /conDashboard.html, etc.
-            setTimeout(() => {
-                window.location.href = data.redirect;
-            }, 500);
-        } else {
-            msg.style.color = "red";
+        if (!data.ok) {
             msg.textContent = data.error || "Invalid login.";
+            msg.style.color = "red";
+            return;
         }
+
+        // ✅ SAVE USER ID + ROLE FOR FUTURE PAGES
+        localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("role", data.role);
+	localStorage.setItem("full_name", data.full_name);
+
+        msg.textContent = "Login successful!";
+        msg.style.color = "green";
+
+        // Give small delay, then redirect
+        setTimeout(() => {
+            window.location.href = data.redirect;
+        }, 500);
     })
     .catch(err => {
-        console.error("Network Error:", err);
+        console.error("Network error:", err);
+        msg.textContent = "Network error.";
         msg.style.color = "red";
-        msg.textContent = "Email or Password are incorrect";
     });
 }

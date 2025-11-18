@@ -1,16 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Post a Job</title>
+    <meta charset="UTF-8">
+    <title>Post a Job</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .form-container {
+            max-width: 450px;
+            margin: auto;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        select, textarea, input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #444;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>Post a New Job</h1>
-  <form action="/jobs" method="POST">
-    <label>Title: <input name="title"></label><br><br>
-    <label>Description: <input name="desc"></label><br><br>
-    <label>Budget ($): <input name="budget" type="number"></label><br><br>
-    <button type="submit">Submit</button>
-  </form>
+
+<div class="form-container">
+    <h2>Post a New Job</h2>
+
+    <form id="jobForm">
+
+        <select id="service_type">
+            <option value="Cleaning">Cleaning</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Lawn Care">Lawn Care</option>
+            <option value="Laundry">Laundry</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <textarea id="description" rows="4" placeholder="Describe the job..."></textarea>
+
+        <input type="number" id="budget" placeholder="Estimated Budget ($)" />
+
+        <button type="submit">Submit Job</button>
+
+    </form>
+
+    <p id="message"></p>
+</div>
+
+<script src="/post_job.js"></script>
 </body>
 </html>
