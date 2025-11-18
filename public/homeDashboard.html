@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-store" />
   <title>Homeowner Dashboard</title>
   <style>
     body {
@@ -50,6 +51,20 @@
       background-color: #005da0;
     }
 
+    .btn-secondary {
+      padding: 10px 18px;
+      background-color: #888;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+     }
+    .btn-secondary:hover {
+      background-color: #666;
+     }
+
     .dash-section {
       margin-bottom: 25px;
     }
@@ -85,84 +100,63 @@
       color: #777;
     }
 
-    .feedback-list {
-      list-style: none;
-      padding-left: 0;
-      margin: 0;
+.feedback-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#reviewForm {
+  margin-top: 20px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+
 </style>
 </head>
 <body>
+<script>
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+</script>
+
   <div class="dashboard-container">
-    <h1>Welcome, Homeowner!</h1>
+	<h1 id="welcomeTitle">Welcome!</h1>
     <p class="tagline">View your jobs, browse services, and see feedback from other homeowners.</p>
 
     <div class="top-actions">
       <a class="btn-primary" href="/homePostJob.html">+ Post a New Job</a>
+      <button id="logoutBtn" class="btn-secondary">Logout</button>
+      <button class="btn-secondary" onclick="openReviewForm()">Write a Review</button>
     </div>
 
-    <!-- Your fake job postings -->
-    <section class="dash-section">
-      <h2>Your Job Posts</h2>
-      <div class="card-grid">
-        <div class="card">
-          <h3>Deep Cleaning – 2 Bedroom Apartment</h3>
-          <small>Status: Open • Budget: $120</small>
-          <p>Date: Nov 20, 2025<br>Looking for a cleaner to do floors, bathroom, and kitchen.</p>
-        </div>
-        <div class="card">
-          <h3>Leaky Kitchen Sink (Plumbing)</h3>
-          <small>Status: In Progress • Budget: $180</small>
-          <p>Date: Nov 18, 2025<br>Contractor assigned: Fix-It Plumbing Co.</p>
-        </div>
-        <div class="card">
-          <h3>Yard Cleanup & Leaf Removal</h3>
-          <small>Status: Completed • Budget: $90</small>
-          <p>Date: Nov 10, 2025<br>Rated 5/5 – “Fast and friendly!”</p>
-        </div>
-      </div>
-    </section>
+	<div id="reviewForm" class="hidden">
+    		<textarea id="reviewText" placeholder="Write your review here..." rows="4"></textarea>
+    		<button class="btn-primary" onclick="submitReview()">Submit Review</button>
+		<button class="btn-secondary" onclick="cancelReview()">Cancel</button>
+    		<p id="reviewMessage"></p>
+	</div>
 
-    <!-- Fake contractor profiles -->
-    <section class="dash-section">
-      <h2>Recommended Contractors</h2>
-      <div class="card-grid">
-        <div class="card">
-          <h3>BrightClean Services</h3>
-          <small>Category: Cleaning • Rating: ★★★★☆ (4.5)</small>
-          <p>Specializes in apartments and houses. Offers deep clean and move-out clean packages.</p>
-        </div>
-        <div class="card">
-          <h3>FlowRight Plumbing</h3>
-          <small>Category: Plumbing • Rating: ★★★★★ (4.9)</small>
-          <p>Emergency leak repair, drain cleaning, and faucet replacements. Serves New Haven area.</p>
-        </div>
-        <div class="card">
-          <h3>GreenYard Landscaping</h3>
-          <small>Category: Outdoor • Rating: ★★★★☆ (4.3)</small>
-          <p>Lawn mowing, leaf removal, and seasonal yard cleanups.</p>
-        </div>
-      </div>
-    </section>
+	<section class="dash-section">
+    <h2>Your Job Posts</h2>
+    <div class="card-grid" id="jobContainer">
+        <p></p>
+    </div>
+	</section>
 
-    <!-- Fake feedback -->
-    <section class="dash-section">
-      <h2>Recent Feedback from Other Homeowners</h2>
-      <ul class="feedback-list">
-        <li>
-          <span class="feedback-author">Lena M.</span>:  
-          “BrightClean Services did an amazing job with my move-out cleaning. Totally worth it.”
-        </li>
-        <li>
-          <span class="feedback-author">Chris T.</span>:  
-          “FlowRight Plumbing showed up on time and fixed my leaking sink in under an hour.”
-        </li>
-        <li>
-          <span class="feedback-author">Ana R.</span>:  
-          “GreenYard Landscaping helped clean all the leaves before a party. Super quick.”
-        </li>
-      </ul>
-    </section>
   </div>
+<script src="/homeDashboard.js"></script>
+
 </body>
 </html>
 

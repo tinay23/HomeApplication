@@ -1,58 +1,54 @@
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("conloginBtn").addEventListener("click", () => login("contractor"));
-  document.getElementById("homeloginBtn").addEventListener("click", () => login("homeowner"));
-  document.getElementById("adminloginBtn").addEventListener("click", () => login("admin"));
+    document.getElementById("conloginBtn").addEventListener("click", () => login("contractor"));
+    document.getElementById("homeloginBtn").addEventListener("click", () => login("homeowner"));
+    document.getElementById("adminloginBtn").addEventListener("click", () => login("admin"));
 });
 
-async function login(role) {
-  const userInput = document.getElementById("username");
-  const passInput = document.getElementById("password");
-  const msg = document.getElementById("message");
+function login(role) {
+    let email = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value;
+    let msg = document.getElementById("message");
 
-  const username = userInput.value.trim();
-  const password = passInput.value;
-
-  if (!username || !password) {
-    msg.style.color = "red";
-    msg.textContent = "Please enter both username and password.";
-    return;
-  }
-
-  try {
-    const res = await fetch("/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        role: role,
-	username: username,
-        password: password,
-      }),
-    });
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok || !data || !data.ok) {
-      msg.style.color = "red";
-      msg.textContent = (data && data.error) || "Invalid username or password.";
-      return;
+    if (!email || !password) {
+        msg.textContent = "Please enter both username and password.";
+        msg.style.color = "red";
+        return;
     }
 
-    msg.style.color = "green";
-    msg.textContent = "Login successful.";
-    const redirectTarget = data.redirect || (
-      role === "contractor"
-        ? "/conDashboard.html"
-        : role === "homeowner"
-        ? "/homeDashboard.html"
-        : "/adminDashboard.html"
-    );
+    // LOGIN USING POST REQUEST
+    fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            email: email,
+            password: password
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
 
-    setTimeout(() => {
-      window.location.href = redirectTarget;
-    }, 400);
-  } catch (err) {
-    console.error(err);
-    msg.style.color = "red";
-    msg.textContent = "Error contacting server.";
-  }
+        if (!data.ok) {
+            msg.textContent = data.error || "Invalid login.";
+            msg.style.color = "red";
+            return;
+        }
+
+        // ✅ SAVE USER ID + ROLE FOR FUTURE PAGES
+        localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("role", data.role);
+	localStorage.setItem("full_name", data.full_name);
+
+        msg.textContent = "Login successful!";
+        msg.style.color = "green";
+
+        // Give small delay, then redirect
+        setTimeout(() => {
+            window.location.href = data.redirect;
+        }, 500);
+    })
+    .catch(err => {
+        console.error("Network error:", err);
+        msg.textContent = "Network error.";
+        msg.style.color = "red";
+    });
 }

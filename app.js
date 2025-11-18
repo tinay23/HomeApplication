@@ -1,178 +1,351 @@
+// ---------------------------------------------------
+// BASIC IMPORTS
+// ---------------------------------------------------
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const pool = require('./database');
 
+// ---------------------------------------------------
+// MYSQL SETUP
+// ---------------------------------------------------
+const mysql = require('mysql2');
+
+const db = mysql.createPool({
+    host: '34.42.140.154',       // your remote MySQL instance
+    user: 'Nodeuser',
+    password: 'KimJenYan330!',
+    database: 'homeapplication'
+});
+
+// Test MySQL connection on server start
+db.getConnection((err, conn) => {
+    if (err) {
+        console.error("MYSQL CONNECTION ERROR:", err);
+    } else {
+        console.log("MYSQL CONNECTED");
+        conn.release();
+    }
+});
+
+// ---------------------------------------------------
+// Helper: Send static files
+// ---------------------------------------------------
 function sendFile(filePath, res) {
-    fs.readFile(filePath, function (err, data) {
+    fs.readFile(filePath, (err, data) => {
         if (err) {
-            error(res, 404, "File not found");
+            res.writeHead(404, { 'content-type': 'text/plain' });
+            res.end("File not found");
             return;
         }
 
         const ext = path.extname(filePath);
-        const contentType = getContentType(ext);
+        const types = {
+            '.html': 'text/html',
+            '.css': 'text/css',
+            '.js': 'text/javascript',
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.gif': 'image/gif',
+            '.json': 'application/json',
+            '.txt': 'text/plain'
+        };
+        const contentType = types[ext] || 'application/octet-stream';
 
         res.writeHead(200, { 'content-type': contentType });
-        res.write(data);
-        res.end();
+        res.end(data);
     });
 }
 
-function getContentType(ext) {
-    const types = {
-        '.html': 'text/html',
-        '.css': 'text/css',
-        '.js': 'text/javascript',
-        '.json': 'application/json',
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.gif': 'image/gif',
-        '.ico': 'image/x-icon',
-        '.txt': 'text/plain'
-    };
-    return types[ext.toLowerCase()] || 'application/octet-stream';
-}
-
-function error(res, status, message) {
-    res.writeHead(status, { 'content-type': 'text/plain' });
-    res.write(message);
-    res.end();
-}
-
-
-// the login using mysql
+// ---------------------------------------------------
+// LOGIN ROUTE (returns user_id + role)
+// ---------------------------------------------------
 function handleLogin(req, res) {
-  let body = '';
-  req.on('data', chunk => (body += chunk));
+    let body = '';
+    req.on('data', chunk => (body += chunk));
 
-  req.on('end', async () => {
-    try {
-      const data = JSON.parse(body || '{}');
+    req.on('end', () => {
+        const data = JSON.parse(body || '{}');
 
-      let role = (data.role || '').toLowerCase();
-      if (role === 'client' || role === 'home') role = 'homeowner';
-      if (role === 'con') role = 'contractor';
+        const email = data.email;
+        const password = data.password;
 
-      const emailOrUsername =
-        (data.email || data.username || '').toLowerCase();
-      const password = data.password || '';
+        if (!email || !password) {
+            res.writeHead(400, { 'content-type': 'application/json' });
+            return res.end(JSON.stringify({ ok: false, error: "Missing email/password" }));
+        }
 
-      if (!role || !emailOrUsername || !password) {
-        res.writeHead(400, { 'content-type': 'application/json' });
-        return res.end(
-          JSON.stringify({
-            ok: false,
-            error: 'Missing role/email/username/password',
-          })
-        );
-      }
+        // MUST select full_name + user_id
+        const sql = "SELECT user_id, role, full_name FROM users WHERE email = ? AND password_hash = ?";
 
-      // this is where it chrcks the users table for a matching user
-      const [rows] = await pool.query(
-        'SELECT * FROM users WHERE role = ? AND email = ? AND password_hash = ? LIMIT 1',
-        [role, emailOrUsername, password]
-      );
-
-      if (rows.length === 0) {
-        // if no matches found then it will prompt invalid
-        res.writeHead(401, { 'content-type': 'application/json' });
-        return res.end(
-          JSON.stringify({ ok: false, error: 'Invalid credentials' })
-        );
-      }
-
-      // ✔️ if their is a match found it will redirect based on role
-      let redirect = '/homeDashboard.html';
-      if (role === 'contractor') redirect = '/conDashboard.html';
-      if (role === 'admin') redirect = '/adminDashboard.html';
-
-      res.writeHead(200, { 'content-type': 'application/json' });
-      return res.end(JSON.stringify({ ok: true, redirect }));
-    } catch (error) {
-      console.error(error);
-      res.writeHead(500, { 'content-type': 'application/json' });
-      return res.end(
-        JSON.stringify({ ok: false, error: 'Server error / bad JSON' })
-      );
-    }
-  });
-}
-
-const serverObj = http.createServer(async function (req, res) {
-    console.log("Request URL:", req.url);
-    const urlObj = url.parse(req.url, true);
-// this is a test 
-if (urlObj.pathname === '/test-db') {
-    try {
-      const [rows] = await pool.query('SELECT 1 + 1 AS result');
-      res.writeHead(200, { 'content-type': 'text/plain' });
-      return res.end('Database connection works! Result: ' + rows[0].result);
-    } catch (err) {
-      console.error(err);
-      res.writeHead(500, { 'content-type': 'text/plain' });
-      return res.end('Database error: ' + err.message);
-    }
-  }
-	// this is the login handleer 
-if (urlObj.pathname === '/login') {
-  // helper for quick JSON responses used by post  
-  function sendJSON(status, obj) {
-    res.writeHead(status, { 'content-type': 'application/json' });
-    return res.end(JSON.stringify(obj));
-  }
-
-  if (req.method === 'GET') {
-    const { role, username, password } = urlObj.query || {};
-    if (!role || !username || !password) {
-      res.writeHead(400, { 'content-type': 'text/plain' });
-      return res.end('Missing role/username/password');
-    }
-
-    const redirectMap = {
-      contractor: '/conDashboard.html',
-      homeowner:  '/homeDashboard.html',
-      admin:      '/adminDashboard.html',
-    };
-    const dest = redirectMap[role] || '/login.html';
-    res.writeHead(302, { Location: dest });
-    return res.end();
-  }
-
-  if (req.method === 'POST') {
-    return handleLogin(req, res);
-  }
-
-  res.writeHead(405, { 'content-type': 'text/plain' });
-  return res.end('Method Not Allowed');
-}
-// end of login handler
-
-    switch (urlObj.pathname) {
-        case "/schedule":
-            schedule(urlObj.query, res);
-            break;
-        case "/cancel":
-            cancel(urlObj.query, res);
-            break;
-        case "/check":
-            check(urlObj.query, res);
-            break;
-        default:
-            // Build file path for static files
-            let filePath = path.join(__dirname, "public", urlObj.pathname);
-
-            // Default to index.html
-            if (urlObj.pathname === "/") {
-                filePath = path.join(__dirname, "public", "index.html");
+        db.query(sql, [email, password], (err, results) => {
+            if (err) {
+                console.log("DB ERROR:", err);
+                res.writeHead(500, { 'content-type': 'application/json' });
+                return res.end(JSON.stringify({ ok: false, error: "Database error" }));
             }
 
-            sendFile(filePath, res);
+            if (results.length === 0) {
+                res.writeHead(401, { 'content-type': 'application/json' });
+                return res.end(JSON.stringify({ ok: false, error: "Invalid email or password" }));
+            }
+
+            // THIS fixes your error
+            const user = results[0];
+
+            const redirectMap = {
+                homeowner: '/homeDashboard.html',
+                contractor: '/conDashboard.html',
+                admin: '/adminDashboard.html'
+            };
+
+            const redirect = redirectMap[user.role] || '/login.html';
+
+            // Return full_name + user_id + role
+            res.writeHead(200, { 'content-type': 'application/json' });
+            res.end(JSON.stringify({
+                ok: true,
+                redirect,
+                user_id: user.user_id,
+                full_name: user.full_name,
+                role: user.role
+            }));
+        });
+    });
+}
+
+// ---------------------------------------------------
+// CREATE USER ROUTE
+// ---------------------------------------------------
+function handleCreateUser(req, res) {
+    let body = "";
+    req.on("data", chunk => (body += chunk));
+
+    req.on("end", () => {
+        let data;
+
+        try {
+            data = JSON.parse(body);
+        } catch (e) {
+            res.writeHead(400, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false, error: "Invalid JSON" }));
+        }
+
+        const { full_name, email, password, role } = data;
+
+        if (!full_name || !email || !password || !role) {
+            res.writeHead(400, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false, error: "Missing fields" }));
+        }
+
+        const sql = `
+            INSERT INTO users (role, full_name, email, password_hash, created_at)
+            VALUES (?, ?, ?, ?, NOW())
+        `;
+
+        db.query(sql, [role, full_name, email, password], (err, result) => {
+            if (err) {
+                console.error("DB INSERT ERROR:", err);
+                res.writeHead(500, { "content-type": "application/json" });
+                return res.end(JSON.stringify({ ok: false, error: "Database insert failed" }));
+            }
+
+            res.writeHead(200, { "content-type": "application/json" });
+            res.end(JSON.stringify({ ok: true, user_id: result.insertId }));
+        });
+    });
+}
+
+// ---------------------------------------------------
+// CREATE JOB ROUTE
+// ---------------------------------------------------
+function handleCreateJob(req, res) {
+    let body = "";
+    req.on("data", chunk => (body += chunk));
+
+    req.on("end", () => {
+        let data;
+
+        try {
+            data = JSON.parse(body);
+        } catch (err) {
+            res.writeHead(400, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false, error: "Invalid JSON" }));
+        }
+
+        const { homeowner_id, service_type, description, budget } = data;
+
+        if (!homeowner_id || !service_type || !description || !budget) {
+            res.writeHead(400, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false, error: "Missing fields" }));
+        }
+
+        const sql = `
+            INSERT INTO service_requests (homeowner_id, service_type, description, budget)
+            VALUES (?, ?, ?, ?)
+        `;
+
+        db.query(sql, [homeowner_id, service_type, description, budget], (err, result) => {
+            if (err) {
+                console.error("DB INSERT ERROR:", err);
+                res.writeHead(500, { "content-type": "application/json" });
+                return res.end(JSON.stringify({ ok: false, error: "Database insert failed" }));
+            }
+
+            res.writeHead(200, { "content-type": "application/json" });
+            res.end(JSON.stringify({ ok: true, job_id: result.insertId }));
+        });
+    });
+}
+
+// ---------------------------------------------------
+// GET JOBS ROUTE
+// ---------------------------------------------------
+function handleGetJobs(req, res, urlObj) {
+    const homeowner_id = urlObj.query.homeowner_id;
+
+    if (!homeowner_id) {
+        res.writeHead(400, { "content-type": "application/json" });
+        return res.end(JSON.stringify({ ok: false, error: "Missing homeowner_id" }));
     }
+
+    const sql = `
+        SELECT job_id, service_type, description, budget, status, created_at
+        FROM service_requests
+        WHERE homeowner_id = ?
+        ORDER BY job_id DESC
+    `;
+
+    db.query(sql, [homeowner_id], (err, results) => {
+        if (err) {
+            console.error("DB SELECT ERROR:", err);
+            res.writeHead(500, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false, error: "Database read failed" }));
+        }
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ ok: true, jobs: results }));
+    });
+}
+
+// ---------------------------------------------------
+// ADD REVIEWS
+// ---------------------------------------------------
+
+function handleAddReview(req, res) {
+    let body = "";
+    req.on("data", chunk => body += chunk);
+
+    req.on("end", () => {
+        let data;
+        try { data = JSON.parse(body); }
+        catch { return error(res, 400, "Invalid JSON"); }
+
+        const { homeowner_id, reviewer_name, review_text } = data;
+
+        if (!homeowner_id || !reviewer_name || !review_text) {
+            res.writeHead(400, { 'content-type': 'application/json' });
+            return res.end(JSON.stringify({ ok: false, error: "Missing fields" }));
+        }
+
+        const sql = `
+            INSERT INTO reviews (homeowner_id, reviewer_name, review_text)
+            VALUES (?, ?, ?)
+        `;
+
+        db.query(sql, [homeowner_id, reviewer_name, review_text], (err) => {
+            if (err) {
+                console.log("REVIEW INSERT ERROR:", err);
+                res.writeHead(500, { 'content-type': 'application/json' });
+                return res.end(JSON.stringify({ ok: false, error: "Database error" }));
+            }
+
+            res.writeHead(200, { 'content-type': 'application/json' });
+            res.end(JSON.stringify({ ok: true }));
+        });
+    });
+}
+
+// ---------------------------------------------------
+// GET REVIEWS
+// ---------------------------------------------------
+
+function handleGetReviews(req, res) {
+    const sql = `
+        SELECT reviewer_name, review_text, profile_image, created_at
+        FROM reviews
+        ORDER BY review_id DESC
+        LIMIT 20
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.log("REVIEW FETCH ERROR:", err);
+            res.writeHead(500, { 'content-type': 'application/json' });
+            return res.end(JSON.stringify({ ok: false }));
+        }
+
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, reviews: results }));
+    });
+}
+
+
+// ---------------------------------------------------
+// MAIN SERVER ROUTER
+// ---------------------------------------------------
+const serverObj = http.createServer((req, res) => {
+    console.log("Request URL:", req.url);
+
+    const urlObj = url.parse(req.url, true);
+
+    // LOGIN (POST)
+    if (urlObj.pathname === '/login' && req.method === 'POST') {
+        return handleLogin(req, res);
+    }
+
+    // CREATE USER (POST)
+    if (urlObj.pathname === '/create_user' && req.method === 'POST') {
+        return handleCreateUser(req, res);
+    }
+
+    // CREATE JOB (POST)
+    if (urlObj.pathname === '/create_job' && req.method === 'POST') {
+        return handleCreateJob(req, res);
+    }
+
+    // GET JOBS (GET)
+    if (urlObj.pathname === '/get_jobs' && req.method === 'GET') {
+        return handleGetJobs(req, res, urlObj);
+    }
+
+    // ADD  REVIEWS
+    if (urlObj.pathname === "/add_review" && req.method === "POST") {
+        return handleAddReview(req, res);
+    }
+
+    // GET REVIEWS
+    if (urlObj.pathname === "/get_reviews" && req.method === "GET") {
+        return handleGetReviews(req, res);
+    }
+
+
+
+    // STATIC FILE HANDLER
+    let filePath = path.join(__dirname, "public", urlObj.pathname);
+
+    if (urlObj.pathname === "/") {
+        filePath = path.join(__dirname, "public", "index.html");
+    }
+
+    sendFile(filePath, res);
 });
 
-serverObj.listen(80, function () {
+// ---------------------------------------------------
+// START SERVER
+// ---------------------------------------------------
+serverObj.listen(80, () => {
     console.log("Server is listening on port 80");
 });

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account</title>
+
+<style>
+    body {
+        background: url("https://static.vecteezy.com/system/resources/thumbnails/057/283/718/small/gradient-blue-wave-poster-background-free-vector.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.93);
+        padding: 35px;
+        width: 350px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.25);
+        text-align: center;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: #222;
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    input, select {
+        width: 90%;
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid #222;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+
+    button {
+        width: 95%;
+        background: black;
+        color: white;
+        padding: 12px;
+        border: none;
+        margin-top: 15px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #444;
+    }
+
+    .message {
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    a {
+        display: block;
+        margin-top: 15px;
+        text-decoration: none;
+        font-size: 14px;
+        color: #333;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <h2>Create Account</h2>
+
+    <input type="text" id="full_name" placeholder="Full Name">
+
+    <input type="text" id="email" placeholder="Email">
+
+    <input type="password" id="password" placeholder="Password">
+
+    <select id="role">
+        <option value="homeowner">Homeowner</option>
+        <option value="contractor">Contractor</option>
+        <option value="admin">Admin</option>
+    </select>
+
+    <button onclick="createUser()">Create User</button>
+
+    <a href="login.html">Back to Login</a>
+
+    <p id="message" class="message"></p>
+</div>
+
+<script>
+function createUser() {
+    const full_name = document.getElementById("full_name").value.trim();
+    const email     = document.getElementById("email").value.trim();
+    const password  = document.getElementById("password").value;
+    const role      = document.getElementById("role").value;
+    const msg       = document.getElementById("message");
+
+    if (!full_name || !email || !password) {
+        msg.style.color = "red";
+        msg.textContent = "All fields are required.";
+        return;
+    }
+
+    fetch("/create_user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            full_name: full_name,
+            email: email,
+            password: password,
+            role: role
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.ok) {
+            msg.style.color = "green";
+            msg.textContent = "User created successfully!";
+        } else {
+            msg.style.color = "red";
+            msg.textContent = data.error || "Failed to create user.";
+        }
+    })
+    .catch(err => {
+        msg.style.color = "red";
+        msg.textContent = "Network error — could not reach server.";
+        console.error(err);
+    });
+}
+</script>
+
+</body>
+</html>
