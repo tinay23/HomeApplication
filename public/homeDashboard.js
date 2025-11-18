@@ -1,5 +1,11 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("reviewForm");
+    form.classList.add("hidden");
+});
+
+
 if (!localStorage.getItem("user_id")) {
-    window.location.replace = "/login.html"; // block access
+    window.location.replace("/login.html"); // block access
 }
 
 document.addEventListener("DOMContentLoaded", loadJobs);
@@ -65,6 +71,14 @@ async function loadJobs() {
 function openReviewForm() {
     document.getElementById("reviewForm").classList.remove("hidden");
 }
+
+function cancelReview() {
+    const form = document.getElementById("reviewForm");
+    form.classList.add("hidden");
+    document.getElementById("reviewText").value = "";
+    document.getElementById("reviewMessage").textContent = "";
+}
+
 
 async function submitReview() {
     const text = document.getElementById("reviewText").value.trim();
