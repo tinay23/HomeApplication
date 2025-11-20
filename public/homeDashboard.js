@@ -17,13 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadJobs() {
-    const container = document.getElementById("jobContainer");
+    const openContainer = document.getElementById("openJobsContainer");
+    const completedContainer = document.getElementById("completedJobsContainer");
+
     const user_id = localStorage.getItem("user_id");
     const role = localStorage.getItem("role");
 
     // SECURITY CHECK
     if (!user_id || role !== "homeowner") {
-        container.innerHTML = "<p style='color:red;'>You must be logged in as a homeowner.</p>";
+        openContainer.innerHTML = "<p style='color:red;'>You must be logged in as a homeowner.</p>";
+        completedContainer.innerHTML = "";
         return;
     }
 
@@ -32,41 +35,68 @@ async function loadJobs() {
         const data = await res.json();
 
         if (!data.ok) {
-            container.innerHTML = "<p style='color:red;'>Failed to load jobs.</p>";
+            openContainer.innerHTML = "<p style='color:red;'>Failed to load jobs.</p>";
+            completedContainer.innerHTML = "";
             return;
         }
 
         const jobs = data.jobs;
 
-        // If homeowner has no jobs
-        if (!jobs || jobs.length === 0) {
-            container.innerHTML = "<p>You haven’t posted any jobs yet.</p>";
-            return;
+        // Split jobs by status
+        const openJobs = jobs.filter(j => j.status !== "completed");
+        const completedJobs = jobs.filter(j => j.status === "completed");
+
+        // --- OPEN JOBS SECTION ---
+        if (openJobs.length === 0) {
+            openContainer.innerHTML = "<p>You have no open jobs.</p>";
+        } else {
+            openContainer.innerHTML = "";
+            openJobs.forEach(job => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+
+                card.innerHTML = `
+                    <h3>${job.service_type}</h3>
+                    <small>Status: ${job.status} • Budget: $${job.budget}</small>
+                    <p>${job.description}</p>
+                    <small>Posted: ${new Date(job.created_at).toLocaleDateString()}</small>
+                `;
+
+                openContainer.appendChild(card);
+            });
         }
 
-        // Clear container
-        container.innerHTML = "";
+        // --- COMPLETED JOBS SECTION ---
+        if (completedJobs.length === 0) {
+            completedContainer.innerHTML = "<p>You have no completed jobs.</p>";
+        } else {
+            completedContainer.innerHTML = "";
+            completedJobs.forEach(job => {
+                const card = document.createElement("div");
+                card.classList.add("card");
 
-        // Build job cards
-        jobs.forEach(job => {
-            const card = document.createElement("div");
-            card.classList.add("card");
+                card.innerHTML = `
+                    <h3>${job.service_type}</h3>
+                    <small>Status: Completed • Budget: $${job.budget}</small>
+                    <p>${job.description}</p>
+                    <small>Completed: ${
+                        job.completed_at 
+                            ? new Date(job.completed_at).toLocaleDateString()
+                            : "Unknown"
+                    }</small>
+                `;
 
-            card.innerHTML = `
-                <h3>${job.service_type}</h3>
-                <small>Status: ${job.status} • Budget: $${job.budget}</small>
-                <p>${job.description}</p>
-                <small>Posted: ${new Date(job.created_at).toLocaleDateString()}</small>
-            `;
-
-            container.appendChild(card);
-        });
+                completedContainer.appendChild(card);
+            });
+        }
 
     } catch (error) {
         console.error("Fetch error:", error);
-        container.innerHTML = "<p style='color:red;'>Error fetching jobs.</p>";
+        openContainer.innerHTML = "<p style='color:red;'>Error fetching jobs.</p>";
+        completedContainer.innerHTML = "";
     }
 }
+
 
 function openReviewForm() {
     document.getElementById("reviewForm").classList.remove("hidden");

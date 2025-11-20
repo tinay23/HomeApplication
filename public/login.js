@@ -52,3 +52,14 @@ function login(role) {
         msg.style.color = "red";
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); 
+
+            // Click homeowner login by default, OR whichever you prefer
+            document.getElementById("conloginBtn").click();
+        }
+    });
+});

@@ -211,7 +211,7 @@ function handleGetJobs(req, res, urlObj) {
     }
 
     const sql = `
-        SELECT job_id, service_type, description, budget, status, created_at
+        SELECT job_id, service_type, description, budget, status, created_at, completed_at
         FROM service_requests
         WHERE homeowner_id = ?
         ORDER BY job_id DESC
@@ -291,6 +291,148 @@ function handleGetReviews(req, res) {
     });
 }
 
+// ---------------------------------------------------
+// CONTRACTOR: GET AVAILABLE JOBS
+// ---------------------------------------------------
+function handleContractorGetAvailable(req, res) {
+    const sql = `
+        SELECT job_id, service_type, description, budget, status, created_at
+        FROM service_requests
+        WHERE status = 'open'
+        ORDER BY created_at DESC
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.log("DB ERROR:", err);
+            res.writeHead(500, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false }));
+        }
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ ok: true, jobs: results }));
+    });
+}
+
+
+
+// ---------------------------------------------------
+// CONTRACTOR: GET IN-PROGRESS JOBS
+// ---------------------------------------------------
+function handleContractorGetInProgress(req, res, urlObj) {
+    const contractor_id = urlObj.query.contractor_id;
+
+    const sql = `
+        SELECT job_id, service_type, description, budget, status, created_at
+        FROM service_requests
+        WHERE status = 'in_progress' AND contractor_id = ?
+        ORDER BY created_at DESC
+    `;
+
+    db.query(sql, [contractor_id], (err, results) => {
+        if (err) {
+            console.log("DB ERROR:", err);
+            res.writeHead(500, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false }));
+        }
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ ok: true, jobs: results }));
+    });
+}
+
+
+
+// ---------------------------------------------------
+// CONTRACTOR: GET COMPLETED JOBS
+// ---------------------------------------------------
+function handleContractorGetCompleted(req, res, urlObj) {
+    const contractor_id = urlObj.query.contractor_id;
+
+    const sql = `
+        SELECT job_id, service_type, description, budget, status, created_at, completed_at
+        FROM service_requests
+        WHERE status = 'completed' AND contractor_id = ?
+        ORDER BY created_at DESC
+    `;
+
+    db.query(sql, [contractor_id], (err, results) => {
+        if (err) {
+            console.log("DB ERROR:", err);
+            res.writeHead(500, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false }));
+        }
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ ok: true, jobs: results }));
+    });
+}
+
+
+
+// ---------------------------------------------------
+// CONTRACTOR: ACCEPT A JOB
+// ---------------------------------------------------
+function handleContractorAcceptJob(req, res) {
+    let body = "";
+    req.on("data", chunk => body += chunk);
+
+    req.on("end", () => {
+        const data = JSON.parse(body);
+        const { job_id, contractor_id } = data;
+
+        const sql = `
+            UPDATE service_requests
+            SET status = 'in_progress', contractor_id = ?
+            WHERE job_id = ?
+        `;
+
+        db.query(sql, [contractor_id, job_id], (err) => {
+            if (err) {
+                console.log("DB ERROR:", err);
+                res.writeHead(500, { "content-type": "application/json" });
+                return res.end(JSON.stringify({ ok: false }));
+            }
+
+            res.writeHead(200, { "content-type": "application/json" });
+            res.end(JSON.stringify({ ok: true }));
+        });
+    });
+}
+
+
+
+// ---------------------------------------------------
+// CONTRACTOR: COMPLETE A JOB
+// ---------------------------------------------------
+function handleContractorCompleteJob(req, res) {
+    let body = "";
+    req.on("data", chunk => body += chunk);
+
+    req.on("end", () => {
+        const data = JSON.parse(body);
+        const { job_id, contractor_id } = data;
+
+        const sql = `
+            UPDATE service_requests
+            SET status = 'completed', completed_at = NOW()
+            WHERE job_id = ? AND contractor_id = ?
+        `;
+
+        db.query(sql, [job_id, contractor_id], (err) => {
+            if (err) {
+                console.log("DB ERROR:", err);
+                res.writeHead(500, { "content-type": "application/json" });
+                return res.end(JSON.stringify({ ok: false }));
+            }
+
+            res.writeHead(200, { "content-type": "application/json" });
+            res.end(JSON.stringify({ ok: true }));
+        });
+    });
+}
+
+
 
 // ---------------------------------------------------
 // MAIN SERVER ROUTER
@@ -330,6 +472,34 @@ const serverObj = http.createServer((req, res) => {
         return handleGetReviews(req, res);
     }
 
+// ---------------------------------------------------
+// CONTRACTOR ROUTES — MATCHING YOUR FRONTEND
+// ---------------------------------------------------
+
+// AVAILABLE JOBS
+if (urlObj.pathname === "/contractor_get_jobs" && req.method === "GET") {
+    return handleContractorGetAvailable(req, res);
+}
+
+// IN-PROGRESS JOBS
+if (urlObj.pathname === "/contractor_get_inprogress_jobs" && req.method === "GET") {
+    return handleContractorGetInProgress(req, res, urlObj);
+}
+
+// COMPLETED JOBS
+if (urlObj.pathname === "/contractor_get_completed_jobs" && req.method === "GET") {
+    return handleContractorGetCompleted(req, res, urlObj);
+}
+
+// ACCEPT JOB
+if (urlObj.pathname === "/contractor_accept_job" && req.method === "POST") {
+    return handleContractorAcceptJob(req, res);
+}
+
+// COMPLETE JOB
+if (urlObj.pathname === "/contractor_complete_job" && req.method === "POST") {
+    return handleContractorCompleteJob(req, res);
+}
 
 
     // STATIC FILE HANDLER
