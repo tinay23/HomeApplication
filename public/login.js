@@ -37,6 +37,7 @@ function login(role) {
         localStorage.setItem("user_id", data.user_id);
         localStorage.setItem("role", data.role);
 	localStorage.setItem("full_name", data.full_name);
+	localStorage.setItem("first_name", data.full_name.split(" ")[0]);
 
         msg.textContent = "Login successful!";
         msg.style.color = "green";

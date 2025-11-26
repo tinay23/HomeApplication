@@ -5,6 +5,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const pool = require('./database');
 
 // ---------------------------------------------------
 // MYSQL SETUP
@@ -432,6 +433,31 @@ function handleContractorCompleteJob(req, res) {
     });
 }
 
+// ---------------------------------------------------
+// GET MESSAGES
+// ---------------------------------------------------
+function handleGetMessages(req, res, urlObj) {
+    const { job_id } = urlObj.query;
+
+    if (!job_id) {
+        res.writeHead(400, { "content-type": "application/json" });
+        return res.end(JSON.stringify({ ok: false, error: "Missing job_id" }));
+    }
+
+    db.query(
+        "SELECT sender_id, sender_label, message, sent_at AS created_at FROM messages WHERE job_id = ? ORDER BY sent_at ASC",
+        [job_id],
+        (err, results) => {
+            if (err) {
+                console.error("GET MESSAGES ERROR:", err);
+                res.writeHead(500, { "content-type": "application/json" });
+                return res.end(JSON.stringify({ ok: false, error: "Database error" }));
+            }
+            res.writeHead(200, { "content-type": "application/json" });
+            res.end(JSON.stringify({ ok: true, messages: results }));
+        }
+    );
+}
 
 
 // ---------------------------------------------------
@@ -471,6 +497,12 @@ const serverObj = http.createServer((req, res) => {
     if (urlObj.pathname === "/get_reviews" && req.method === "GET") {
         return handleGetReviews(req, res);
     }
+
+    // GET MESSAGES
+    if (urlObj.pathname === "/get_messages" && req.method === "GET") {
+        return handleGetMessages(req, res, urlObj);
+    }
+
 
 // ---------------------------------------------------
 // CONTRACTOR ROUTES — MATCHING YOUR FRONTEND
@@ -513,8 +545,47 @@ if (urlObj.pathname === "/contractor_complete_job" && req.method === "POST") {
 });
 
 // ---------------------------------------------------
+// SOCKET.IO SETUP
+// ---------------------------------------------------
+const { Server } = require("socket.io");
+const io = new Server(serverObj, {
+    cors: { origin: "*" },
+});
+
+io.on("connection", (socket) => {
+    console.log("User connected:", socket.id);
+
+    // Join a specific job room
+    socket.on("join_room", (job_id) => {
+        socket.join("job_" + job_id);
+    });
+
+    // When a message is sent
+    socket.on("send_message", (data) => {
+        const { job_id, sender_id, sender_label, message } = data;
+
+        // Save to database (recommended)
+        db.query(
+            "INSERT INTO messages (job_id, sender_id, sender_label, message) VALUES (?, ?, ?, ?)",
+            [job_id, sender_id, sender_label, message],
+            (err) => {
+                if (err) console.error("DB insert error:", err);
+            }
+        );
+
+        // Broadcast message to others in the room
+        io.to("job_" + job_id).emit("receive_message", {
+            job_id,
+            sender_id,
+            sender_label,
+            message
+        });
+    });
+});
+// ---------------------------------------------------
 // START SERVER
 // ---------------------------------------------------
 serverObj.listen(80, () => {
     console.log("Server is listening on port 80");
 });
+
