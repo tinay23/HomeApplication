@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contractor Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4; /* light grey */
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tagline {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .top-actions {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: #0077cc;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      margin: 4px 6px;
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      background-color: #005da0;
+    }
+
+    .btn-secondary {
+      background-color: #777;
+    }
+
+    .btn-secondary:hover {
+      background-color: #555;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 15px;
+      text-decoration: none;
+      color: #0077cc;
+      font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .profile-section {
+      margin-top: 10px;
+    }
+
+    .profile-section h2 {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
+    }
+
+    .profile-field {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+
+    .profile-field label {
+      font-weight: bold;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .profile-field input,
+    .profile-field textarea,
+    .profile-field select {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+
+    .profile-field textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+
+    .readonly-note {
+      font-size: 0.85rem;
+      color: #777;
+      margin-bottom: 10px;
+    }
+
+    .button-row {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    
+
+    <h1>Your Profile</h1>
+    <p class="tagline">Review your details below and click "Edit Profile" to make changes.</p>
+
+    <div class="top-actions">
+      <button id="editBtn" class="btn-primary">Edit Profile</button>
+	  <a class="btn-primary" href="conDashboard.html">Dashboard</a>
+      <div id="editButtons" class="hidden">
+        <button id="saveBtn" class="btn-primary">Save Changes</button>
+        <button id="cancelBtn" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+
+    <p class="readonly-note" id="readonlyNote">
+      Currently in view-only mode. Click "Edit Profile" to make changes.
+    </p>
+
+    <section class="profile-section">
+      <h2>Basic Information</h2>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" value="Alex Johnson" disabled>
+        </div>
+        <div class="profile-field">
+          <label for="businessName">Business Name</label>
+          <input type="text" id="businessName" value="BrightClean Services" disabled>
+        </div>
+        <div class="profile-field">
+          <label for="tradeType">Primary Trade</label>
+          <select id="tradeType" disabled>
+            <option>Cleaning</option>
+            <option>Plumbing</option>
+            <option>Electrical</option>
+            <option>Landscaping</option>
+            <option>General Handyman</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label for="email">Email</label>
+          <input type="email" id="email" value="alex@brightcleanservices.com" disabled>
+        </div>
+        <div class="profile-field">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" value="(555) 123-4567" disabled>
+        </div>
+        <div class="profile-field">
+          <label for="serviceArea">Service Area</label>
+          <input type="text" id="serviceArea" value="Downtown & Northside neighborhoods" disabled>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <h2>Availability & Rates</h2>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label for="hourlyRate">Typical Hourly Rate</label>
+          <input type="number" id="hourlyRate" value="45" disabled>
+        </div>
+        <div class="profile-field">
+          <label for="availability">General Availability</label>
+          <input type="text" id="availability" value="Mon–Fri, 9am–5pm" disabled>
+        </div>
+        <div class="profile-field" style="grid-column: 1 / -1;">
+          <label for="bio">Bio</label>
+          <textarea id="bio" disabled>Professional cleaner with 5+ years of experience in move-out and deep cleaning for apartments and small homes.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <h2>Certifications, Skills, & Ratings</h2>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label>Certifications</label>
+          <input type="text" id="certs" value="Plumbing, Electrical" disabled>
+        </div>
+        <div class="profile-field">
+          <label>Skills</label>
+          <input type="text" id="skills" value="Deep cleaning, move-out cleaning, kitchen & bathroom detailing" disabled>
+        </div>
+		<div class="profile-field">
+          <label>Rating</label>
+          <input type="text" id="rating" value="4/5" disabled>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="conPro.js"></script>
+</body>
+</html>

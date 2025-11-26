@@ -3,6 +3,8 @@ if (localStorage.getItem("role") !== "contractor") {
     window.location.replace("/login.html");
 }
 
+const contractor_id = localStorage.getItem("user_id");
+
 // Show contractor's first name
 document.addEventListener("DOMContentLoaded", () => {
     const fullName = localStorage.getItem("full_name") || "";
@@ -12,18 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (title) {
         title.textContent = `Welcome, ${firstName}`;
     }
-});
 
-const contractor_id = localStorage.getItem("user_id");
-
-// Store available jobs for sorting
-let availableJobsCache = [];
-
-document.addEventListener("DOMContentLoaded", () => {
     loadAvailableJobs();
     setupTabs();
     setupSorting();
 });
+
+// Store available jobs for sorting
+let availableJobsCache = [];
 
 // Setup tabs
 function setupTabs() {
@@ -48,38 +46,35 @@ function setActive(id) {
     document.getElementById(id).classList.add("active");
 
     const sortContainer = document.getElementById("sortContainer");
-
     if (id === "tab-available") {
-        // Show sorting when on 'Available Jobs'
         sortContainer.style.display = "block";
     } else {
-        // Hide sorting for other tabs
         sortContainer.style.display = "none";
     }
 }
 
 // -----------------------
-// LOAD Available Jobs
+// LOAD Available Jobs (no chat here)
 // -----------------------
 async function loadAvailableJobs() {
     const res = await fetch("/contractor_get_jobs");
     const data = await res.json();
-    availableJobsCache = data.jobs;  // store jobs for sorting
-    applySorting();                  // apply current sort
+    availableJobsCache = data.jobs || [];
+    applySorting();
 }
 
 // -----------------------
 async function loadInProgressJobs() {
     const res = await fetch(`/contractor_get_inprogress_jobs?contractor_id=${contractor_id}`);
     const data = await res.json();
-    displayJobs(data.jobs, "in_progress");
+    displayJobs(data.jobs || [], "in_progress");
 }
 
 // -----------------------
 async function loadCompletedJobs() {
     const res = await fetch(`/contractor_get_completed_jobs?contractor_id=${contractor_id}`);
     const data = await res.json();
-    displayJobs(data.jobs, "completed");
+    displayJobs(data.jobs || [], "completed");
 }
 
 // -----------------------
@@ -93,7 +88,10 @@ function setupSorting() {
 }
 
 function applySorting() {
-    if (!availableJobsCache || availableJobsCache.length === 0) return;
+    if (!availableJobsCache || availableJobsCache.length === 0) {
+        displayJobs([], "available");
+        return;
+    }
 
     const sortValue = document.getElementById("sortSelect").value;
     let sortedJobs = [...availableJobsCache];
@@ -113,6 +111,7 @@ function applySorting() {
 
 // -----------------------
 // DISPLAY JOB CARDS
+// Chat ONLY for type === "in_progress"
 // -----------------------
 function displayJobs(jobs, type) {
     const container = document.getElementById("contentContainer");
@@ -133,11 +132,16 @@ function displayJobs(jobs, type) {
         `;
 
         if (type === "available") {
+            // Accept only, no chat
             card += `<button class="btn-accept" onclick="acceptJob(${job.job_id})">Accept Job</button>`;
         }
 
         if (type === "in_progress") {
-            card += `<button class="btn-complete" onclick="completeJob(${job.job_id})">Mark Completed</button>`;
+            // Chat + Mark completed
+            card += `
+                <button class="btn-chat" onclick="openChat(${job.job_id})">Open Chat</button>
+                <button class="btn-complete" onclick="completeJob(${job.job_id})">Mark Completed</button>
+            `;
         }
 
         if (type === "completed") {
@@ -157,7 +161,7 @@ function displayJobs(jobs, type) {
 }
 
 // -----------------------
-// ACCEPT JOB
+// ACCEPT JOB (status -> in_progress)
 // -----------------------
 async function acceptJob(job_id) {
     await fetch("/contractor_accept_job", {
@@ -166,11 +170,15 @@ async function acceptJob(job_id) {
         body: JSON.stringify({ job_id, contractor_id })
     });
 
+    // Refresh lists
     loadAvailableJobs();
+    // Optionally, auto switch to in-progress:
+    // setActive("tab-progress");
+    // loadInProgressJobs();
 }
 
 // -----------------------
-// COMPLETE JOB
+// COMPLETE JOB (status -> completed)
 // -----------------------
 async function completeJob(job_id) {
     await fetch("/contractor_complete_job", {
@@ -182,6 +190,93 @@ async function completeJob(job_id) {
     loadInProgressJobs();
 }
 
+// -----------------------
+// SOCKET.IO CHAT (CONTRACTOR)
+// -----------------------
+const socket = io();
+let activeJobId = null;
+
+function openChat(job_id) {
+    activeJobId = job_id;
+
+    document.getElementById("chatPanel").classList.remove("hidden");
+    document.getElementById("chatJobTitle").textContent = "Job #" + job_id;
+
+    // Join socket room
+    socket.emit("join_room", job_id);
+
+    // Load previous messages
+    loadChatMessages(job_id);
+}
+
+function closeChat() {
+    document.getElementById("chatPanel").classList.add("hidden");
+    activeJobId = null;
+}
+
+async function loadChatMessages(job_id) {
+    const res = await fetch(`/get_messages?job_id=${job_id}`);
+    const data = await res.json();
+
+    const box = document.getElementById("chatMessages");
+    box.innerHTML = "";
+
+    if (!data.ok || !data.messages) return;
+
+    data.messages.forEach(m => {
+        const div = document.createElement("div");
+	const name = m.sender_label || `User ${m.sender_id}`;
+	div.innerHTML = `<strong>${name}</strong>: ${m.message}`;
+
+        box.appendChild(div);
+    });
+
+    box.scrollTop = box.scrollHeight;
+}
+
+function sendChatMessage() {
+    const input = document.getElementById("chatInput");
+    const msg = input.value.trim();
+    if (!msg || !activeJobId) return;
+
+    const sender_id = localStorage.getItem("user_id");
+
+    socket.emit("send_message", {
+        job_id: activeJobId,
+        sender_id,
+	sender_label: getSenderLabel(),
+        message: msg
+    });
+
+    input.value = "";
+}
+
+function getSenderLabel() {
+    const role = localStorage.getItem("role");
+    const first = localStorage.getItem("first_name");
+
+    if (role === "homeowner") return first;
+    if (role === "contractor") return `Contractor (${first})`;
+
+    return first;
+}
+
+
+socket.on("receive_message", (data) => {
+    if (data.job_id !== activeJobId) return;
+
+    const box = document.getElementById("chatMessages");
+    const div = document.createElement("div");
+    const name = data.sender_label || `User ${data.sender_id}`;
+    div.innerHTML = `<strong>${name}</strong>: ${data.message}`;
+
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+});
+
+// -----------------------
+// LOGOUT
+// -----------------------
 document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.removeItem("user_id");
     localStorage.removeItem("role");
