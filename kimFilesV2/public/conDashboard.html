@@ -73,7 +73,7 @@
     }
 
     .btn-warning {
-      background-color: #c0392b;
+      background-color: red;
       color: #fff;
     }
 
@@ -167,6 +167,7 @@
 
     <div class="top-actions">
       <a class="btn-primary" href="conPro.html">Profile</a>
+	  <a class="btn-primary" href="conPayments.html">View Payments</a>
     </div>
 
     <!-- open jobs -->
@@ -185,10 +186,15 @@
     <section class="dash-section">
       <h2>Current Jobs</h2>
       <div class="card-grid">
-        <div class="card">
+         <div class="card" data-job-id="1">
           <h3>Clean Apartment for move-out</h3>
-          <small>Status: In Progress • Budget: $180</small>
+          <small class="job-status-line">Status: In Progress • Budget: $180</small>
           <p>Date: Nov 18, 2025<br>Contractor assigned: BrightClean Services.</p>
+
+          <div class="job-actions">
+            <button class="btn-secondary modify-job-btn">Modify Job</button>
+            <button class="btn-warning cancel-job-btn">Cancel Job</button>
+          </div>
         </div>
       </div>
     </section>
