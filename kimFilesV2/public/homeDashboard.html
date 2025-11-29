@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>Homeowner Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tagline {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .top-actions {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: #0077cc;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: #005da0;
+    }
+
+    .btn-secondary {
+      padding: 10px 18px;
+      background-color: #888;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #666;
+    }
+
+    .dash-section {
+      margin-bottom: 25px;
+    }
+
+    .dash-section h2 {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 4px;
+      font-size: 1.05rem;
+    }
+
+    .card small {
+      color: #777;
+    }
+
+    .btn-chat {
+      margin-top: 10px;
+      padding: 8px 14px;
+      background: #0077cc;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .chat-panel {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 320px;
+      height: 420px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 999;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .chat-header {
+      padding: 10px;
+      background: #0077cc;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f7f7f7;
+    }
+
+    .chat-input-section {
+      padding: 10px;
+      display: flex;
+      gap: 5px;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input-section input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .chat-send {
+      padding: 8px 12px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .feedback-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    #reviewForm {
+      margin-top: 20px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+<script>
+  // Force reload when navigating back to this page
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+</script>
+
+<div class="dashboard-container">
+  <h1 id="welcomeTitle">Welcome!</h1>
+  <p class="tagline">View your jobs, browse services, and see feedback from other homeowners.</p>
+
+  <div class="top-actions">
+    <a class="btn-primary" href="/homePostJob.html">+ Post a New Job</a>
+	<a class="btn-primary" href="homeContractors.html">View Contractors</a>
+    <button id="logoutBtn" class="btn-secondary">Logout</button>
+    <button class="btn-secondary" onclick="openReviewForm()">Write a Review</button>
+  </div>
+
+  <div id="reviewForm" class="hidden">
+    <textarea id="reviewText" placeholder="Write your review here..." rows="4" style="width:100%;"></textarea>
+    <br>
+    <button class="btn-primary" onclick="submitReview()">Submit Review</button>
+    <button class="btn-secondary" onclick="cancelReview()">Cancel</button>
+    <p id="reviewMessage"></p>
+  </div>
+
+  <section class="dash-section">
+    <h2>Your Open Jobs</h2>
+    <div class="card-grid" id="openJobsContainer"></div>
+  </section>
+
+  <section class="dash-section">
+    <h2>Your In-Progress Jobs</h2>
+    <div class="card-grid" id="inProgressJobsContainer"></div>
+  </section>
+
+  <section class="dash-section">
+    <h2>Your Completed Jobs</h2>
+    <div class="card-grid" id="completedJobsContainer"></div>
+  </section>
+</div>
+
+<!-- Shared Chat Panel -->
+<div id="chatPanel" class="chat-panel hidden">
+  <div class="chat-header">
+    <span id="chatJobTitle">Chat</span>
+    <button onclick="closeChat()" style="background:none;border:none;color:white;font-size:16px;cursor:pointer;">✖</button>
+  </div>
+  <div id="chatMessages" class="chat-messages"></div>
+  <div class="chat-input-section">
+    <input id="chatInput" type="text" placeholder="Type a message...">
+    <button class="chat-send" onclick="sendChatMessage()">Send</button>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="/homeDashboard.js"></script>
+</body>
+</html>
