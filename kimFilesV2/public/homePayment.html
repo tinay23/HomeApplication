@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Make a Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tagline {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 15px;
+      text-decoration: none;
+      color: #0077cc;
+      font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-field label {
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .form-field input,
+    .form-field select {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: #0077cc;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    .btn-primary:hover {
+      background-color: #005da0;
+    }
+
+    .small-note {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 8px;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .message.success {
+      background-color: #e8f6e9;
+      border: 1px solid #27ae60;
+      color: #1e8449;
+    }
+
+    .message.error {
+      background-color: #fdecea;
+      border: 1px solid #c0392b;
+      color: #922b21;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <a href="homeDashboard.html" class="back-link">&larr; Back to Home</a>
+
+    <h1>Make a Payment</h1>
+
+    <form id="paymentForm">
+      <div class="form-grid">
+        <div class="form-field full-width">
+          <label for="jobSelect">Job / Service</label>
+          <select id="jobSelect" required>
+            <option value="">Select a job...</option>
+            <!-- Prototype; format could be used with database -->
+            <option value="1" data-contractor="BrightClean Services">
+              Move-out Cleaning – 2 Bedroom Apartment (BrightClean Services)
+            </option>
+            <option value="2" data-contractor="Fix-It Plumbing Co.">
+              Leaky Kitchen Sink (Fix-It Plumbing Co.)
+            </option>
+            <option value="3" data-contractor="GreenYard Landscaping">
+              Yard Cleanup – Pre-Party (GreenYard Landscaping)
+            </option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="homeownerName">Your Name</label>
+          <input type="text" id="homeownerName" required placeholder="John Doe">
+        </div>
+
+        <div class="form-field">
+          <label for="amount">Amount (USD)</label>
+          <input type="number" id="amount" required min="1" step="0.01" placeholder="e.g., 120.00">
+        </div>
+
+        <div class="form-field full-width">
+          <label for="cardName">Name on Card</label>
+          <input type="text" id="cardName" required placeholder="John Doe">
+        </div>
+
+        <div class="form-field">
+          <label for="cardNumber">Card Number</label>
+          <input type="text" id="cardNumber" required placeholder="1234 5678 9011 1213">
+        </div>
+
+        <div class="form-field">
+          <label for="expiry">Expiry (MM/YY)</label>
+          <input type="text" id="expiry" required placeholder="01/02">
+        </div>
+
+        <div class="form-field">
+          <label for="cvv">CVV</label>
+          <input type="password" id="cvv" required placeholder="123">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">Submit Payment</button>
+      
+	  <!-- will be used by js if needed -->
+      <div id="messageBox" class="message" style="display:none;"></div>
+    </form>
+  </div>
+
+  <script src="homePayment.js"></script>
+</body>
+</html>

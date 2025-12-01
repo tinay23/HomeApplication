@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contractor Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4; /* light grey */
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tagline {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .top-actions {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: #0077cc;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background-color: #005da0;
+    }
+
+    .btn-secondary,
+    .btn-warning {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-right: 6px;
+    }
+
+    .btn-secondary {
+      background-color: #777;
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background-color: #555;
+    }
+
+    .btn-warning {
+      background-color: red;
+      color: #fff;
+    }
+
+    .btn-warning:hover {
+      background-color: #922b21;
+    }
+
+    .dash-section {
+      margin-bottom: 25px;
+    }
+
+    .dash-section h2 {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 4px;
+      font-size: 1.05rem;
+    }
+
+    .card small {
+      color: #777;
+    }
+
+    .feedback-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .feedback-item {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .feedback-author {
+      font-weight: bold;
+    }
+
+    .feedback-text {
+      display: inline-block;
+      margin-left: 4px;
+    }
+
+    .feedback-actions {
+      margin-top: 6px;
+    }
+
+    .feedback-response {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #333;
+      padding-left: 10px;
+      border-left: 3px solid #0077cc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      background-color: #f39c12;
+      color: #fff;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <h1>Welcome, Contractor!</h1>
+    <p class="tagline">View/Edit your profile, browse Jobs, and see feedback.</p>
+
+    <div class="top-actions">
+      <a class="btn-primary" href="conPro.html">Profile</a>
+	  <a class="btn-primary" href="conPayments.html">View Payments</a>
+    </div>
+
+    <!-- open jobs -->
+    <section class="dash-section">
+      <h2>Open Job Posts</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>Deep Cleaning – 2 Bedroom Apartment</h3>
+          <small>Status: Open • Budget: $120</small>
+          <p>Date: Nov 20, 2025<br>Looking for a cleaner to do floors, bathroom, and kitchen.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Current Jobs -->
+    <section class="dash-section">
+      <h2>Current Jobs</h2>
+      <div class="card-grid">
+         <div class="card" data-job-id="1">
+          <h3>Clean Apartment for move-out</h3>
+          <small class="job-status-line">Status: In Progress • Budget: $180</small>
+          <p>Date: Nov 18, 2025<br>Contractor assigned: BrightClean Services.</p>
+
+          <div class="job-actions">
+            <button class="btn-secondary modify-job-btn">Modify Job</button>
+            <button class="btn-warning cancel-job-btn">Cancel Job</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feedback -->
+    <section class="dash-section">
+      <h2>Recent Feedback from Homeowners</h2>
+      <ul class="feedback-list">
+        <li class="feedback-item" data-feedback-id="1">
+          <span class="feedback-author">Anonymous</span>:
+          <span class="feedback-text">
+            “BrightClean Services did an amazing job with my move-out cleaning. Totally worth it.”
+          </span>
+          <div class="feedback-actions">
+            <button class="btn-secondary respond-btn">Respond</button>
+            <button class="btn-warning dispute-btn">Dispute</button>
+          </div>
+          <div class="feedback-response"></div>
+        </li>
+
+        <li class="feedback-item" data-feedback-id="2">
+          <span class="feedback-author">John Doe</span>:
+          <span class="feedback-text">
+            “BrightClean Services showed up on time and fixed my leaking sink in under an hour.”
+          </span>
+          <div class="feedback-actions">
+            <button class="btn-secondary respond-btn">Respond</button>
+            <button class="btn-warning dispute-btn">Dispute</button>
+          </div>
+          <div class="feedback-response"></div>
+        </li>
+
+        <li class="feedback-item" data-feedback-id="3">
+          <span class="feedback-author">Jane Doe</span>:
+          <span class="feedback-text">
+            “BrightClean Services helped clean all the leaves before a party. Super quick.”
+          </span>
+          <div class="feedback-actions">
+            <button class="btn-secondary respond-btn">Respond</button>
+            <button class="btn-warning dispute-btn">Dispute</button>
+          </div>
+          <div class="feedback-response"></div>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+ 
+   <script src="contractorFeedback.js"></script>
+ 
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Browse Contractors</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tagline {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 15px;
+      text-decoration: none;
+      color: #0077cc;
+      font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .filters {
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1px solid #e0e0e0;
+      font-size: 0.95rem;
+    }
+
+    .card h3 {
+      margin: 0 0 4px 0;
+      font-size: 1.05rem;
+    }
+
+    .card small {
+      color: #777;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .rating {
+      font-weight: bold;
+      color: #e67e22;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 5px;
+      background-color: #0077cc;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    .btn:hover {
+      background-color: #005da0;
+    }
+
+    .small-note {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    #emptyMessage {
+      text-align: center;
+      color: #777;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <a href="homeDashboard.html" class="back-link">&larr; Home</a>
+
+    <h1>Find a Contractor</h1>
+    <p class="tagline">Browse available contractors and view their profiles before booking.</p>
+
+    <div class="filters">
+      <div>
+        <label for="searchInput">Search by name or business:</label><br>
+        <input type="text" id="searchInput" placeholder="e.g. Alex, BrightClean">
+      </div>
+      <div>
+        <label for="tradeFilter">Filter by trade:</label><br>
+        <select id="tradeFilter">
+          <option value="">All trades</option>
+          <option value="Cleaning">Cleaning</option>
+          <option value="Plumbing">Plumbing</option>
+          <option value="Electrical">Electrical</option>
+          <option value="Landscaping">Landscaping</option>
+          <option value="General Handyman">General Handyman</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="contractorGrid" class="card-grid">
+      <!-- Cards inserted by homeContractors.js -->
+    </div>
+
+    <p id="emptyMessage" class="hidden">No contractors match your search.</p>
+
+    <p class="small-note">
+      Tip: Click “View Profile” to see more details about a contractor.
+    </p>
+  </div>
+
+  <script src="homeContractors.js"></script>
+</body>
+</html>

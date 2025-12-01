@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Contractors</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tagline {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 15px;
+      text-decoration: none;
+      color: #0077cc;
+      font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-right: 4px;
+    }
+
+    .btn-edit {
+      background-color: #0077cc;
+      color: #fff;
+    }
+
+    .btn-edit:hover {
+      background-color: #005da0;
+    }
+
+    .btn-delete {
+      background-color: #c0392b;
+      color: #fff;
+    }
+
+    .btn-delete:hover {
+      background-color: #922b21;
+    }
+
+    .edit-panel {
+      margin-top: 25px;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background-color: #fafafa;
+    }
+
+    .edit-panel h2 {
+      margin-top: 0;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .form-field {
+      flex: 1 1 220px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-field label {
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 3px;
+    }
+
+    .form-field input,
+    .form-field select {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    .edit-actions {
+      margin-top: 10px;
+    }
+	
+	.top-actions {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+	
+	.btn-primary {
+      display: inline-block;
+      padding: 10px 18px;
+      background-color: #0077cc;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: #005da0;
+    }
+
+    .btn-save {
+      background-color: #27ae60;
+      color: #fff;
+    }
+
+    .btn-save:hover {
+      background-color: #1e8449;
+    }
+
+    .btn-cancel {
+      background-color: #777;
+      color: #fff;
+    }
+
+    .btn-cancel:hover {
+      background-color: #555;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .small-note {
+      font-size: 0.85rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+
+    <h1>Admin – Contractors</h1>
+	
+	<div class="top-actions">	
+	<a class="btn-primary" href="adminDashboard.html">Dashboard</a>
+	</div>
+	
+    <p class="tagline">View, edit, or delete contractor accounts pulled from the database.</p>
+
+    <!-- Users -->
+    <table id="contractorTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Business</th>
+          <th>Certs</th>
+          <th>Rating</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filled dynamically by JS -->
+      </tbody>
+    </table>
+
+    <p class="small-note">
+      Tip: Click "Edit" to modify a contractor, or "Delete" to remove them.
+    </p>
+
+    <!-- Edit -->
+    <div id="editPanel" class="edit-panel hidden">
+      <h2>Edit Contractor</h2>
+
+      <input type="hidden" id="edit-id">
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="edit-fullName">Full Name</label>
+          <input type="text" id="edit-fullName">
+        </div>
+        <div class="form-field">
+          <label for="edit-businessName">Business</label>
+          <input type="text" id="edit-businessName">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="edit-tradeType">Certs</label>
+          <select id="edit-tradeType">
+            <option value="Cleaning">Cleaning</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Landscaping">Landscaping</option>
+            <option value="General Handyman">General Handyman</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="edit-rating">Rating</label>
+          <input type="number" id="edit-rating" min="1" max="5" step="0.1">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="edit-email">Email</label>
+          <input type="email" id="edit-email">
+        </div>
+        <div class="form-field">
+          <label for="edit-phone">Phone</label>
+          <input type="tel" id="edit-phone">
+        </div>
+      </div>
+
+      <div class="edit-actions">
+        <button id="saveEditBtn" class="btn btn-save">Save Changes</button>
+        <button id="cancelEditBtn" class="btn btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="adminCon.js"></script>
+</body>
+</html>

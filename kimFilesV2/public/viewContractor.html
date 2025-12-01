@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contractor Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .tagline {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 15px;
+      text-decoration: none;
+      color: #0077cc;
+      font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .profile-section {
+      margin-top: 10px;
+    }
+
+    .profile-section h2 {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
+    }
+
+    .profile-field {
+      margin-bottom: 8px;
+    }
+
+    .label {
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .value {
+      font-size: 0.95rem;
+      margin-top: 2px;
+    }
+
+    .rating {
+      font-weight: bold;
+      color: #e67e22;
+    }
+
+    .muted {
+      color: #777;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <a href="homeContractors.html" class="back-link">&larr; Back to Contractors</a>
+
+    <h1 id="profileTitle">Contractor Profile</h1>
+    <p class="tagline" id="profileTagline">Loading contractor details...</p>
+
+    <section class="profile-section">
+      <h2>Basic Information</h2>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <div class="label">Full Name</div>
+          <div class="value" id="fullName">–</div>
+        </div>
+        <div class="profile-field">
+          <div class="label">Business / Company</div>
+          <div class="value" id="businessName">–</div>
+        </div>
+        <div class="profile-field">
+          <div class="label">Trade</div>
+          <div class="value" id="tradeType">–</div>
+        </div>
+        <div class="profile-field">
+          <div class="label">Rating</div>
+          <div class="value rating" id="rating">–</div>
+        </div>
+        <div class="profile-field">
+          <div class="label">Service Area</div>
+          <div class="value" id="serviceArea">–</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <h2>About</h2>
+      <p class="value" id="bio">–</p>
+    </section>
+
+    <section class="profile-section">
+      <h2>Skills & Services</h2>
+      <p class="value" id="skills">–</p>
+      <p class="value" id="extras"><span class="label">Extras: </span><span id="extrasText">–</span></p>
+    </section>
+
+    <section class="profile-section">
+      <h2>Contact</h2>
+      <p class="muted">
+        Note: Only share your contact details with contractors you feel comfortable working with.
+      </p>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <div class="label">Email</div>
+          <div class="value" id="email">–</div>
+        </div>
+        <div class="profile-field">
+          <div class="label">Phone</div>
+          <div class="value" id="phone">–</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="viewContractor.js"></script>
+</body>
+</html>
