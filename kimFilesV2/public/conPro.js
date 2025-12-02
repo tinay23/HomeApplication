@@ -29,9 +29,9 @@ const editBtn = document.getElementById('editBtn');
 
     function exitEditMode(restoreOriginal) {
       if (restoreOriginal) {
-        // Put back previous values
+        // Put back previous values, if restoreOriginal true
         fields.forEach((field) => {
-			//using id as subscript for array
+			//using id as subscript for array, replace old values
           if (originalValues[field.id] !== undefined) {
             field.value = originalValues[field.id];
           }
@@ -48,11 +48,50 @@ const editBtn = document.getElementById('editBtn');
     }
 
     saveBtn.addEventListener('click', function () {
-      // update database
-      exitEditMode(false);
+     
+	// gather info into updated var package
+	  const updated = {
+	    fullName: document.getElementById('fullName').value.trim(),
+	    businessName: document.getElementById('businessName').value.trim(),
+	    tradeType: document.getElementById('tradeType').value,
+	    email: document.getElementById('email').value.trim(),
+	    phone: document.getElementById('phone').value.trim(),
+	    serviceArea: document.getElementById('serviceArea').value.trim(),
+	    hourlyRate: Number(document.getElementById('hourlyRate').value),
+	    availability: document.getElementById('availability').value.trim(),
+	    bio: document.getElementById('bio').value.trim(),
+	    certs: document.getElementById('certs').value.trim(),
+	    skills: document.getElementById('skills').value.trim()
+	  
+	  };
+
+  try {
+	  //try to make connection
+    const response = await fetch(`/api/contractors/${contractorId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+		 //update information
+      body: JSON.stringify(updated)
     });
 
+	  //if we dont get a good respone, throw error
+    if (!response.ok) {
+      throw new Error('Failed to update contractor profile');
+    }
+	  
+ //Notify success, disable edit, reload data,keep the edited values
+    alert('Profile updated successfully.');
+    exitEditMode(false); 
+  } catch (err) {
+    console.error(err);
+    alert('Error saving changes (check console).');
+  }
+	});
+      
+	//cancel function, exits and keeps original values
     cancelBtn.addEventListener('click', function () {
-	  //cancel
+	 
       exitEditMode(true);
     });
