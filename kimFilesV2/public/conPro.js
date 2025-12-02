@@ -48,7 +48,8 @@ const editBtn = document.getElementById('editBtn');
     }
 
     saveBtn.addEventListener('click', function () {
-     
+			exitEditMode(false);
+		/*
 	// gather info into updated var package
 	  const updated = {
 	    fullName: document.getElementById('fullName').value.trim(),
@@ -87,7 +88,7 @@ const editBtn = document.getElementById('editBtn');
   } catch (err) {
     console.error(err);
     alert('Error saving changes (check console).');
-  }
+  } */
 	});
       
 	//cancel function, exits and keeps original values
