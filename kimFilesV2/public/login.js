@@ -75,7 +75,7 @@ function login(role) {
       msg.style.color = "green";
       msg.textContent = serverMsg || "Login successful(server).";
 
-      //just in case 
+      //backup if proper redirect doesnt work
       if (!redirectTarget) {
         redirectTarget =
           role === "contractor"
@@ -85,31 +85,35 @@ function login(role) {
             : "adminDashboard.html";
       }
 
-      //adding pause for testing
+      //adding pause for visiblity of login message
       setTimeout(() => (window.location.href = redirectTarget), 500);
       return;
     }
 
-    //testing off server
+    //For testing off database/server
     const testUsers = {
       contractor: { user: "contractor1", pass: "password123", redirect: "conDashboard.html" },
       homeowner: { user: "homeowner1", pass: "password123", redirect: "homeDashboard.html" },
       admin: { user: "admin1", pass: "password123", redirect: "adminDashboard.html" },
     };
 
+	//test login logic
     const test = testUsers[role];
+	//if username and password match then log in
     if (test && user === test.user && pass === test.pass) {
       msg.style.color = "green";
+		//message displays the login if via hardcode
       msg.textContent = "Login successful (hardcode).";
       setTimeout(() => (window.location.href = test.redirect), 500);
     } else {
+		//invalid login
       msg.style.color = "red";
       msg.textContent = serverMsg || "Invalid username or password.";
     }
   }
 
   function loadError() {
-    // Network error → fall back to mock credentials (still gives demo behavior)
+    // Network error, fall back to hardcode credentials (for testing)
     const msg = document.getElementById("message");
     const testUsers = {
       contractor: { user: "contractor1", pass: "password123", redirect: "conDashboard.html" },
@@ -117,6 +121,7 @@ function login(role) {
       admin: { user: "admin1", pass: "password123", redirect: "adminDashboard.html" },
     };
 
+	//test login logic
     const test = testUsers[role];
     if (test && document.getElementById("username").value.trim() === test.user && document.getElementById("password").value === test.pass) {
       msg.style.color = "green";
