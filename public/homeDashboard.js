@@ -97,7 +97,18 @@ function jobCard(job, isCompleted = false) {
                     }</small>`
                 : ""
             }
-            ${isInProgress ? `<button class="btn-chat" onclick="openChat(${job.job_id})">Open Chat</button>` : ""}
+            ${
+                isInProgress
+                ? `
+                    <button class="btn-chat" onclick="openChat(${job.job_id})">Open Chat</button>
+		    <!-- Report the contractor attached to this job -->
+                    <button class="btn-secondary" onclick="reportUser(${job.contractor_id}, 'contractor')">
+                        Report Contractor
+                    </button>
+                    <button class="btn-secondary" onclick="reportJob(${job.job_id})">Report Issue</button>
+                  `
+                : ""
+            }
         </div>
     `;
 }
@@ -233,6 +244,78 @@ socket.on("receive_message", (data) => {
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
 });
+
+
+async function reportJob(job_id) {
+    const reason = prompt("Describe the issue with this job (spam, scam, inappropriate behavior, etc.):");
+    if (!reason) return;
+
+    const reporter_id = localStorage.getItem("user_id");
+
+    try {
+        const res = await fetch("/create_report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                reporter_id,
+                target_type: "job",
+                target_id: job_id,
+                reason
+            })
+        });
+
+        const data = await res.json();
+        if (data.ok) {
+            alert("Thank you. Your report has been submitted to the admin.");
+        } else {
+            alert("Could not submit report: " + (data.error || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("REPORT ERROR:", err);
+        alert("Error sending report.");
+    }
+}
+
+let pendingReportUserId = null;
+let pendingReportType = null;
+
+function reportUser(target_id, type) {
+    pendingReportUserId = target_id;
+    pendingReportType = type;
+    document.getElementById("reportReason").value = "";
+    document.getElementById("reportModal").classList.remove("hidden");
+}
+
+async function submitUserReport() {
+    const reason = document.getElementById("reportReason").value.trim();
+    if (!reason) return alert("Enter a reason before submitting.");
+
+    const reporter_id = localStorage.getItem("user_id");
+
+    const res = await fetch("/create_report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            reporter_id,
+            target_type: pendingReportType, // 'contractor'
+            target_id: pendingReportUserId,
+            reason
+        })
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+        alert("Report submitted.");
+        closeReportModal();
+    } else {
+        alert("Failed to submit report.");
+    }
+}
+
+function closeReportModal() {
+    document.getElementById("reportModal").classList.add("hidden");
+}
+
 
 /* ================================
    LOGOUT
