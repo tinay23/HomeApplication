@@ -23,7 +23,7 @@ async function loadContractors() {
 }
 
 /*
-
+//for server.js/app.js
 // load all contractors
 app.get('/api/contractors', (req, res) => {
 	//select all contractors
