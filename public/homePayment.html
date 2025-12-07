@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payments</title>
+<meta http-equiv="Cache-Control" content="no-store">
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .invoice-card {
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #fafafa;
+        margin-bottom: 15px;
+    }
+
+    .btn-pay {
+        background: #28a745;
+        color: white;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-back {
+        background: #0077cc;
+        color: white;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .status-paid {
+        color: green;
+        font-weight: bold;
+    }
+
+    .status-unpaid {
+        color: red;
+        font-weight: bold;
+    }
+
+    .hidden { display:none !important; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Your Payments</h1>
+<div id="cardStatus"   style="margin:15px 0; padding:12px; background:#eef4ff;  border-radius:8px; font-weight:bold; color:#003366;">
+</div>
+
+<button id="removeCardBtn"        class="btn-back"        style="background:#cc0000; margin-bottom:15px; display:none;"        onclick="removeCard()">    ❌ Remove Card
+</button>
+
+    <button class="btn-back" onclick="window.location.href='/homeDashboard.html'">
+        ← Back to Dashboard
+    </button>
+
+
+<!-- Add Card Section -->
+<div style="margin-top:20px;">
+    <button class="btn-pay" onclick="openCardModal()">➕ Add Credit Card</button>
+    <p id="cardStatus" style="color:#555; margin-top:8px;"></p>
+</div>
+
+<!-- CREDIT CARD MODAL -->
+<div id="cardModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%;background:rgba(0,0,0,0.6); display:flex; justify-content:center;align-items:center; z-index:1000;">
+
+    <div style="background:white; padding:25px; width:350px; border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,0.2); position:relative;">
+
+        <h2 style="text-align:center; margin-top:0;">Add Credit Card</h2>
+
+        <!-- Card Preview -->
+        <div id="cardPreview" style="background:linear-gradient(135deg,#4b79a1,#283e51);border-radius:12px; padding:20px; color:white; height:160px;display:flex; flex-direction:column; justify-content:space-between;margin-bottom:20px; font-family:'Courier New', monospace;">
+            
+            <div style="font-size:12px; opacity:0.8;">CREDIT CARD</div>
+
+            <div id="previewNumber" style="font-size:20px; letter-spacing:2px;">
+                **** **** **** ****
+            </div>
+
+            <div style="display:flex; justify-content:space-between;">
+                <div id="previewName">CARDHOLDER NAME</div>
+                <div id="previewExpiry">MM/YY</div>
+            </div>
+        </div>
+
+        <!-- Input Fields -->
+        <label>Card Number</label>
+        <input id="cardNumber" maxlength="19" placeholder="1234 5678 9123 4567"oninput="formatCardNumber(this)"style="width:100%; padding:10px; margin-bottom:12px;">
+
+        <label>Cardholder Name</label>
+        <input id="cardName" placeholder="John Doe"oninput="updateCardPreview()"style="width:100%; padding:10px; margin-bottom:12px;">
+
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>Expiration</label>
+                <select id="expMonth" onchange="updateCardPreview()"style="width:100%; padding:10px; margin-bottom:12px;">
+                    <option value="">MM</option>
+                    <script>
+                        for (let i = 1; i <= 12; i++) {
+                            document.write(`<option value="${String(i).padStart(2,'0')}">${String(i).padStart(2,'0')}</option>`);
+                        }
+                    </script>
+                </select>
+            </div>
+
+            <div style="flex:1;">
+                <label>&nbsp;</label>
+                <select id="expYear" onchange="updateCardPreview()"style="width:100%; padding:10px; margin-bottom:12px;">
+                    <option value="">YY</option>
+                    <script>
+                        const year = new Date().getFullYear() % 100;
+                        for (let y = year; y <= year + 12; y++) {
+                            document.write(`<option value="${String(y)}">${String(y)}</option>`);
+                        }
+                    </script>
+                </select>
+            </div>
+
+            <div style="flex:1;">
+                <label>CVV</label>
+                <input id="cvv" maxlength="4" placeholder="123"oninput="this.value=this.value.replace(/[^0-9]/g,'')"style="width:100%; padding:10px; margin-bottom:12px;">
+            </div>
+        </div>
+
+        <button class="btn-pay" onclick="saveCard()" style="width:100%; margin-top:10px;">
+            Save Card
+        </button>
+
+        <button class="btn-back" onclick="closeCardModal()" style="width:100%; margin-top:10px;">
+            Cancel
+        </button>
+    </div>
+</div>
+
+
+    <h2 style="margin-top:20px;">Invoices</h2>
+
+    <div id="invoiceList"></div>
+</div>
+
+<div id="processingOverlay"     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;background:rgba(0,0,0,0.6); z-index:9999; color:white;   font-size:26px; align-items:center; justify-content:center;">Processing Payment...
+</div>
+
+
+<script src="/homePayment.js"></script>
+</body>
+</html>

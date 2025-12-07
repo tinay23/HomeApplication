@@ -422,18 +422,114 @@ function handleContractorCompleteJob(req, res) {
         const data = JSON.parse(body);
         const { job_id, contractor_id } = data;
 
-        const sql = `
+        // 1. Update job to completed
+        const sql1 = `
             UPDATE service_requests
             SET status = 'completed', completed_at = NOW()
             WHERE job_id = ? AND contractor_id = ?
         `;
 
-        db.query(sql, [job_id, contractor_id], (err) => {
+        db.query(sql1, [job_id, contractor_id], (err) => {
             if (err) {
                 console.log("DB ERROR:", err);
                 res.writeHead(500, { "content-type": "application/json" });
                 return res.end(JSON.stringify({ ok: false }));
             }
+
+            // 2. Fetch job details to determine amount + homeowner
+            const sql2 = `
+                SELECT homeowner_id, budget 
+                FROM service_requests
+                WHERE job_id = ?
+            `;
+
+            db.query(sql2, [job_id], (err, results) => {
+                if (err || results.length === 0) {
+                    console.error(err);
+                    return res.end(JSON.stringify({ ok: false }));
+                }
+
+                const { homeowner_id, budget } = results[0];
+
+                // 3. AUTO-GENERATE INVOICE
+                const sql3 = `
+                    INSERT INTO invoices (job_id, homeowner_id, contractor_id, amount)
+                    VALUES (?, ?, ?, ?)
+                `;
+
+                db.query(sql3, [job_id, homeowner_id, contractor_id, budget], (err) => {
+                    if (err) {
+                        console.error("CREATE INVOICE ERROR:", err);
+                        return res.end(JSON.stringify({ ok: false }));
+                    }
+
+                    res.writeHead(200, { "content-type": "application/json" });
+                    res.end(JSON.stringify({ ok: true, invoice: true }));
+                });
+            });
+        });
+    });
+}
+
+// ---------------------------------------------------
+// GET HOMEOWNER INVOICES
+// ---------------------------------------------------
+function handleGetHomeownerInvoices(req, res, urlObj) {
+    const homeowner_id = urlObj.query.homeowner_id;
+
+    const sql = `
+        SELECT i.*, u.full_name AS contractor_name, s.service_type
+        FROM invoices i
+        JOIN users u ON i.contractor_id = u.user_id
+        JOIN service_requests s ON i.job_id = s.job_id
+        WHERE i.homeowner_id = ?
+        ORDER BY i.created_at DESC
+    `;
+
+    db.query(sql, [homeowner_id], (err, results) => {
+        if (err) {
+            console.error("INVOICE FETCH ERROR:", err);
+            res.writeHead(500, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false }));
+        }
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ ok: true, invoices: results }));
+    });
+}
+// ---------------------------------------------------
+// PAY INVOICES
+// ---------------------------------------------------
+function handlePayInvoice(req, res) {
+    let body = "";
+    req.on("data", c => body += c);
+
+    req.on("end", () => {
+        const data = JSON.parse(body);
+        const { invoice_id, homeowner_id } = data;
+
+        // Mark invoice as PAID
+        const sql1 = `
+            UPDATE invoices
+            SET status = 'paid', paid_at = NOW()
+            WHERE invoice_id = ? AND homeowner_id = ?
+        `;
+
+        db.query(sql1, [invoice_id, homeowner_id], (err) => {
+            if (err) {
+                console.error(err);
+                return res.end(JSON.stringify({ ok: false }));
+            }
+
+            // Log transaction
+            const sql2 = `
+                INSERT INTO transactions (invoice_id, amount, paid_by, paid_to)
+                SELECT invoice_id, amount, homeowner_id, contractor_id
+                FROM invoices
+                WHERE invoice_id = ?
+            `;
+
+            db.query(sql2, [invoice_id]);
 
             res.writeHead(200, { "content-type": "application/json" });
             res.end(JSON.stringify({ ok: true }));
@@ -442,11 +538,64 @@ function handleContractorCompleteJob(req, res) {
 }
 
 // ---------------------------------------------------
+// CONTRACTORS GET PAYMENTS
+// ---------------------------------------------------
+function handleContractorGetPayments(req, res, urlObj) {
+    const contractor_id = urlObj.query.contractor_id;
+
+    const sql = `
+        SELECT t.*, i.job_id, u.full_name AS homeowner_name
+        FROM transactions t
+        JOIN invoices i ON t.invoice_id = i.invoice_id
+        JOIN users u ON t.paid_by = u.user_id
+        WHERE t.paid_to = ?
+        ORDER BY t.created_at DESC
+    `;
+
+    db.query(sql, [contractor_id], (err, results) => {
+        if (err) {
+            console.error("PAYMENTS ERROR:", err);
+            res.writeHead(500, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false }));
+        }
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ ok: true, payments: results }));
+    });
+}
+// ---------------------------------------------------
+// CONTRACTOR GET INVOICES
+// ---------------------------------------------------
+function handleContractorGetInvoices(req, res, urlObj) {
+    const contractor_id = urlObj.query.contractor_id;
+
+    const sql = `
+        SELECT i.*, u.full_name AS homeowner_name, s.service_type
+        FROM invoices i
+        JOIN users u ON i.homeowner_id = u.user_id
+        JOIN service_requests s ON i.job_id = s.job_id
+        WHERE i.contractor_id = ?
+        ORDER BY i.created_at DESC
+    `;
+
+    db.query(sql, [contractor_id], (err, results) => {
+        if (err) {
+            console.error("INVOICE FETCH ERROR:", err);
+            res.writeHead(500, { "content-type": "application/json" });
+            return res.end(JSON.stringify({ ok: false }));
+        }
+
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ ok: true, invoices: results }));
+    });
+}
+
+
+// ---------------------------------------------------
 // GET MESSAGES
 // ---------------------------------------------------
 function handleGetMessages(req, res, urlObj) {
     const { job_id } = urlObj.query;
-
     if (!job_id) {
         res.writeHead(400, { "content-type": "application/json" });
         return res.end(JSON.stringify({ ok: false, error: "Missing job_id" }));
@@ -832,6 +981,26 @@ const serverObj = http.createServer((req, res) => {
 
     if (urlObj.pathname === "/admin_get_user_chat" && req.method === "GET") {
     return handleAdminGetUserChat(req, res, urlObj);
+    }
+
+    // HOMEOWNER GET INVOICES
+    if (urlObj.pathname === "/get_homeowner_invoices" && req.method === "GET") {
+    return handleGetHomeownerInvoices(req, res, urlObj);
+    }
+
+    // HOMEOWNER PAY INVOICE
+    if (urlObj.pathname === "/pay_invoice" && req.method === "POST") {
+    return handlePayInvoice(req, res);
+    }
+
+    // CONTRACTOR PAYMENT HISTORY
+    if (urlObj.pathname === "/contractor_get_payments" && req.method === "GET") {
+    return handleContractorGetPayments(req, res, urlObj);
+    }
+
+    // CONTRACTOR GET INVOICES
+    if (urlObj.pathname === "/contractor_get_invoices" && req.method === "GET") {
+    return handleContractorGetInvoices(req, res, urlObj);
     }
 
 // ---------------------------------------------------
