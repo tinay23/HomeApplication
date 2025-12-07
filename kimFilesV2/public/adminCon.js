@@ -30,6 +30,24 @@ async function loadContractors() {
   }
 }
 
+/*
+
+//get from database table contractors
+app.get('/api/contractors', (req, res) => {
+  //select all from Contractors, ends in error or results
+  db.query('SELECT * FROM Contractors', (err, results) => {
+  //error message
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Database error" });
+    }
+	//if no error then json results
+    res.json(results);
+  });
+});
+
+*/
+
 //function to make the table using the data we loaded
 function renderTable(contractors) {
   tableBody.innerHTML = ''; 
@@ -126,6 +144,53 @@ saveEditBtn.addEventListener('click', async () => {
   }
 });
 
+/*
+// put for updates using id
+app.put('/api/contractors/:id', (req, res) => {
+  const id = req.params.id;   // contractor being updated
+  const updated = req.body;   // JSON sent 
+
+  //make sql for update 
+  const sql = `
+    UPDATE Contractor
+    SET FullName = ?, Email = ?, Phone = ?, ServiceArea = ?, HourlyRate = ?, Availability = ?, Status = ?, AverageRating = ?, ServiceTypeID = ?
+    WHERE ContractorID = ?
+  `;
+
+  //array for parameters
+  const params = [
+    updated.FullName,
+    updated.Email,
+    updated.Phone,
+    updated.ServiceArea,
+    updated.HourlyRate,
+    updated.Availability,
+    updated.Status,
+    updated.AverageRating,
+    updated.ServiceTypeID,
+    id
+  ];
+
+  //run sql with params in db
+  db.query(sql, params, (err, result) => {
+  //error message
+    if (err) {
+      console.error('Error updating contractor:', err);
+      return res.status(500).json({ message: 'Database error while updating contractor' });
+    }
+
+	//possible missing contractor or error 
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Contractor not found' });
+    }
+
+    //if no error then success
+    res.json({ message: 'Contractor updated successfully' });
+  });
+});
+
+*/
+
 //cancel, disable edit again
 cancelEditBtn.addEventListener('click', () => {
   editPanel.classList.add('hidden');
@@ -156,5 +221,34 @@ async function handleDelete(id) {
     alert('Error deleting contractor (check console).');
   }
 }
+
+/*
+
+// Delete contractor by id
+app.delete('/api/contractors/:id', (req, res) => {
+  const id = req.params.id;  // comes from /api/contractors/id
+
+ //create sql to run
+  const sql = "DELETE FROM Contractor WHERE ContractorID = ?";
+
+ //run sql with id against db
+  db.query(sql, [id], (err, result) => {
+  //error message
+    if (err) {
+      console.error("Error deleting contractor:", err);
+      return res.status(500).json({ message: "Database error while deleting contractor" });
+    }
+
+    // possible no matching id or contractor error
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Contractor not found" });
+    }
+
+    // Success
+    res.json({ message: "Contractor deleted successfully" });
+  });
+});
+
+*/
 
 loadContractors();
