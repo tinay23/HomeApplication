@@ -26,6 +26,7 @@ async function loadHomeowners() {
   }
 }
 /* possible server database code
+//for server.js/app.js
 //gets homeowners from database
 app.get('/api/homeowners', (req, res) => {
 
@@ -131,6 +132,7 @@ saveEditBtn.addEventListener('click', async () => {
 });
 
 /*
+//for server.js/app.js
 //using put to update, using id
 app.put('/api/homeowners/:id', (req, res) => {
   const id = req.params.id;   // from URL /api/homeowners/5
@@ -201,7 +203,7 @@ async function handleDelete(id) {
 }
 
 /*
-
+//for server.js/app.js
 // Delete homeowner by id
 app.delete('/api/homeowners/:id', (req, res) => {
   const id = req.params.id;
