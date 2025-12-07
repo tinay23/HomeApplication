@@ -31,7 +31,7 @@ async function loadContractors() {
 }
 
 /*
-
+//for server.js
 //get from database table contractors
 app.get('/api/contractors', (req, res) => {
   //select all from Contractors, ends in error or results
@@ -145,6 +145,7 @@ saveEditBtn.addEventListener('click', async () => {
 });
 
 /*
+//for server.js
 // put for updates using id
 app.put('/api/contractors/:id', (req, res) => {
   const id = req.params.id;   // contractor being updated
@@ -224,6 +225,7 @@ async function handleDelete(id) {
 
 /*
 
+//for server.js
 // Delete contractor by id
 app.delete('/api/contractors/:id', (req, res) => {
   const id = req.params.id;  // comes from /api/contractors/id
