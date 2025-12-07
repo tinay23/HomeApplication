@@ -89,6 +89,54 @@ const editBtn = document.getElementById('editBtn');
     console.error(err);
     alert('Error saving changes (check console).');
   } */
+
+/*
+
+// Update Contractor Profile
+app.put('/api/contractors/:id', (req, res) => {
+  const id = req.params.id;     // this matches :id in URL
+  const updated = req.body;     // JSON body
+
+ //create sql to run later
+  const sql = `
+    UPDATE Contractor
+    SET FullName = ?, Email = ?, Phone = ?, ServiceArea = ?, HourlyRate = ?, Availability = ?, Status = ?, AverageRating = ?, ServiceTypeID = ?
+    WHERE ContractorID = ?
+  `;
+
+ //array of params for query run
+  const params = [
+    updated.FullName,
+    updated.Email,
+    updated.Phone,
+    updated.ServiceArea,
+    updated.HourlyRate,
+    updated.Availability,
+    updated.Status,
+    updated.AverageRating,
+    updated.ServiceTypeID,
+    id
+  ];
+
+  //run sql with params against db, ends in err or result
+  db.query(sql, params, (err, result) => {
+   //error handling message
+    if (err) {
+      console.error('Error updating contractor profile:', err);
+      return res.status(500).json({ message: 'Database error updating contractor profile' });
+    }
+
+    //possible missing contractor error 
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Contractor not found' });
+    }
+
+    //success message
+    res.json({ message: 'Contractor profile updated successfully' });
+  });
+});
+
+*/
 	});
       
 	//cancel function, exits and keeps original values
