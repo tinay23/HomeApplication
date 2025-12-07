@@ -91,7 +91,7 @@ const editBtn = document.getElementById('editBtn');
   } */
 
 /*
-
+//for server.js/app.js
 // Update Contractor Profile
 app.put('/api/contractors/:id', (req, res) => {
   const id = req.params.id;     // this matches :id in URL
