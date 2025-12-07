@@ -22,6 +22,27 @@ async function loadContractors() {
   }
 }
 
+/*
+
+// load all contractors
+app.get('/api/contractors', (req, res) => {
+	//select all contractors
+  const sql = "SELECT * FROM Contractor"; 
+
+ //run sql aginast db ends in err or results
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching contractors:', err);
+      return res.status(500).json({ message: 'Database error while loading contractors' });
+    }
+
+    //if no error json results
+    res.json(results); 
+  });
+});
+
+*/
+
 //display contractors
 function renderContractors() {
   grid.innerHTML = '';
