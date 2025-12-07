@@ -25,6 +25,22 @@ async function loadHomeowners() {
     alert('Error loading homeowners (check console).');
   }
 }
+/* possible server database code
+//gets homeowners from database
+app.get('/api/homeowners', (req, res) => {
+
+//using sql to select all homeowners
+  db.query('SELECT * FROM Homeowner', (err, results) => {
+  //error handling
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Database error" });
+    }
+	//if no error then json the sql results
+    res.json(results);
+  });
+});
+*/
 
 //function to make the table using the data we loaded
 function renderTable(homeowners) {
@@ -114,6 +130,45 @@ saveEditBtn.addEventListener('click', async () => {
   }
 });
 
+/*
+//using put to update, using id
+app.put('/api/homeowners/:id', (req, res) => {
+  const id = req.params.id;   // from URL /api/homeowners/5
+  const updated = req.body;   // from body: JSON.stringify(updated)
+
+  //creating sql with passed vars, need to add more values as db is created
+  const sql = `
+    UPDATE Homeowner
+    SET FullName = ?, Address = ?
+    WHERE HomeownerID = ?
+  `;
+
+  //array of parameters to update
+  const params = [
+    updated.FullName,
+    updated.Address,
+    id
+  ];
+
+  //attempt to run sql on db with parameters
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      console.error('Error updating homeowner:', err);
+      return res.status(500).json({ message: 'Database error while updating homeowner' });
+    }
+
+    // if no rows were changed, error or maybe the ID doesn't exist yet
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Homeowner not found' });
+    }
+
+	//no error display success
+    res.json({ message: 'Homeowner updated successfully' });
+  });
+});
+
+*/
+
 //cancel, diable and hide edit panel again
 cancelEditBtn.addEventListener('click', () => {
   editPanel.classList.add('hidden');
@@ -144,5 +199,34 @@ async function handleDelete(id) {
     alert('Error deleting homeowner (check console).');
   }
 }
+
+/*
+
+// Delete homeowner by id
+app.delete('/api/homeowners/:id', (req, res) => {
+  const id = req.params.id;
+
+  //make sql for running
+  const sql = "DELETE FROM Homeowner WHERE HomeownerID = ?";
+
+  //run sql with id on db
+  db.query(sql, [id], (err, result) => {
+  //error checking
+    if (err) {
+      console.error("Error deleting homeowner:", err);
+      return res.status(500).json({ message: "Database error while deleting homeowner" });
+    }
+
+    // If no row was deleted, error or the id didn't exist
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Homeowner not found" });
+    }
+
+	//if no error then success
+    res.json({ message: "Homeowner deleted successfully" });
+  });
+});
+
+*/
 
 loadHomeowners();
