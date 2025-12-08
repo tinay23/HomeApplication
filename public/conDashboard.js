@@ -133,7 +133,9 @@ function displayJobs(jobs, type) {
 
         if (type === "available") {
             // Accept only, no chat
-            card += `<button class="btn-accept" onclick="acceptJob(${job.job_id})">Accept Job</button>`;
+            card += `<button class="btn-accept" onclick="acceptJob(${job.job_id})">Accept Job</button>
+	    <button class="btn-accept" onclick="reportJob(${job.job_id})">🚩 Report Job</button>
+`;
         }
 
         if (type === "in_progress") {
@@ -141,7 +143,6 @@ function displayJobs(jobs, type) {
             card += `
                 <button class="btn-chat" onclick="openChat(${job.job_id})">Open Chat</button>
                 <button class="btn-complete" onclick="completeJob(${job.job_id})">Mark Completed</button>
-		<button class="btn-accept" onclick="reportJob(${job.job_id})">Report Issue</button>
 		<button class="btn-accept" onclick="reportUser(${job.homeowner_id}, 'homeowner')">Report Homeowner</button>
 
             `;

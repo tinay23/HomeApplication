@@ -105,7 +105,6 @@ function jobCard(job, isCompleted = false) {
                     <button class="btn-secondary" onclick="reportUser(${job.contractor_id}, 'contractor')">
                         Report Contractor
                     </button>
-                    <button class="btn-secondary" onclick="reportJob(${job.job_id})">Report Issue</button>
                   `
                 : ""
             }
