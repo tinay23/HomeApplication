@@ -157,9 +157,6 @@ async function loadReports() {
                     ` : ""}
 
 		    ${r.target_type === 'job' ? `
-		        <button class="btn btn-info" onclick="viewChat(${r.target_id})">
-        		    View Chat
-    			</button>
     			<button class="btn btn-danger" onclick="deleteJob(${r.target_id}, ${r.report_id})">
         		Delete Job
     			</button>
@@ -370,9 +367,6 @@ function generateReportCard(r) {
                 ` : ""}
 
                 ${r.target_type === 'job' ? `
-                    <button class="btn btn-info" onclick="viewChat(${r.target_id})">
-                        View Chat
-                    </button>
                     <button class="btn btn-danger" onclick="deleteJob(${r.target_id}, ${r.report_id})">
                         Delete Job
                     </button>

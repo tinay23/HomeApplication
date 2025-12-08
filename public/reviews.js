@@ -12,7 +12,6 @@ async function loadReviews() {
     wrapper.innerHTML = data.reviews.map(r => `
         <div class="swiper-slide">
             <div class="testimonial-card">
-                <img src="${r.profile_image || 'default_user.png'}" alt="Profile">
                 <p class="quote">“${r.review_text}”</p>
                 <h3 class="name">${r.reviewer_name}</h3>
             </div>
