@@ -68,26 +68,30 @@ function renderPaymentList(invoices) {
 function renderCharts(invoices) {
     const paidInvoices = invoices.filter(i => i.status === "paid");
 
-    // Group earnings by date (YYYY-MM-DD)
     const earningsByDay = {};
 
     paidInvoices.forEach(inv => {
         const d = new Date(inv.paid_at);
-        const key = d.toISOString().split("T")[0];  // yyyy-mm-dd
+
+        // ✅ LOCAL DATE KEY (prevents UTC shift)
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        const key = `${year}-${month}-${day}`;
 
         if (!earningsByDay[key]) earningsByDay[key] = 0;
         earningsByDay[key] += Number(inv.amount);
     });
 
-    // Convert grouped data into sorted arrays
     const sortedDates = Object.keys(earningsByDay).sort();
+
     const labels = sortedDates.map(date => {
-        return new Date(date).toLocaleDateString();
+        const [y, m, d] = date.split("-");
+        return `${m}/${d}/${y}`;
     });
 
     const amounts = sortedDates.map(date => earningsByDay[date]);
 
-    // Draw chart
     new Chart(document.getElementById("earningsChart"), {
         type: "line",
         data: {
